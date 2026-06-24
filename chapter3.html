@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>챕터 3 — 개별 주식을 고르면 더 낫지 않나요? | Stillwater</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --ink: #1C1C2E; --ink-soft: #4A4A6A; --ink-muted: #9090AA;
+  --paper: #F8F7F3; --paper-warm: #EFECE4;
+  --accent: #2D6A4F; --accent-light: #52B788; --accent-bg: #D8F3DC;
+  --red: #C1121F; --red-bg: #FFE5E7;
+  --gold: #A67C00; --gold-bg: #FFF8E1;
+  --purple: #5B3AB7; --purple-bg: #EDE9FF;
+  --border: #DDDAD0;
+  --font-serif: 'Georgia', serif;
+  --font-sans: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', monospace;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans); background: var(--paper); color: var(--ink);
+  line-height: 1.7; font-size: 15px; max-width: 480px; margin: 0 auto; padding-bottom: 80px;
+}
+.hero { background: var(--ink); color: var(--paper); padding: 52px 24px 44px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; bottom: -40px; right: -40px; width: 160px; height: 160px; border-radius: 50%; background: var(--purple); opacity: 0.12; }
+.hero-series { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 14px; font-weight: 600; position: relative; z-index: 1; }
+.hero-title { font-family: var(--font-serif); font-size: 27px; line-height: 1.3; margin-bottom: 14px; font-weight: normal; position: relative; z-index: 1; }
+.hero-sub { font-size: 14px; color: rgba(248,247,243,0.6); line-height: 1.65; position: relative; z-index: 1; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; background: rgba(82,183,136,0.15); border: 1px solid rgba(82,183,136,0.3); border-radius: 20px; padding: 5px 12px; font-size: 11px; color: var(--accent-light); position: relative; z-index: 1; }
+.section { padding: 32px 20px; border-bottom: 1px solid var(--border); }
+.eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; margin-bottom: 8px; }
+.sec-title { font-family: var(--font-serif); font-size: 21px; line-height: 1.4; margin-bottom: 16px; color: var(--ink); font-weight: normal; }
+.body { font-size: 15px; color: var(--ink-soft); line-height: 1.78; margin-bottom: 14px; }
+.body strong { color: var(--ink); font-weight: 600; }
+.hl { background: var(--accent-bg); border-left: 3px solid var(--accent); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.warn { background: var(--red-bg); border-left: 3px solid var(--red); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.note { background: var(--gold-bg); border-left: 3px solid var(--gold); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+
+/* 랭킹 리스트 */
+.rank-list { margin: 16px 0; }
+.rank-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; margin-bottom: 6px; border: 1.5px solid var(--border); background: var(--paper-warm); }
+.rank-item.tech { background: rgba(91,58,183,0.06); border-color: rgba(91,58,183,0.2); }
+.rank-item.selected { background: var(--accent-bg); border-color: rgba(45,106,79,0.3); }
+.rank-item.dimmed { opacity: 0.45; }
+.rank-num { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--ink-muted); min-width: 24px; }
+.rank-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.rank-sector { font-size: 11px; color: var(--ink-muted); margin-top: 1px; }
+.rank-badge { font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 10px; white-space: nowrap; }
+.badge-tech { background: var(--purple-bg); color: var(--purple); }
+.badge-sel  { background: var(--accent-bg); color: var(--accent); }
+.badge-skip { background: var(--paper-warm); color: var(--ink-muted); border: 1px solid var(--border); }
+
+/* 분위기 카드 */
+.mood-card { background: var(--paper-warm); border-radius: 10px; padding: 14px; border: 1.5px solid var(--border); margin-bottom: 8px; }
+.mood-ticker { font-size: 13px; font-weight: 700; color: var(--purple); margin-bottom: 4px; }
+.mood-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+
+/* 종목 선택기 */
+.stock-picker { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 16px 0; }
+.sp-btn { border-radius: 10px; padding: 14px 8px; text-align: center; cursor: pointer; border: 2px solid var(--border); background: var(--paper-warm); transition: all 0.18s; user-select: none; }
+.sp-btn:active { transform: scale(0.96); }
+.sp-btn.act-jpm { border-color: var(--purple); background: var(--purple-bg); }
+.sp-btn.act-xom { border-color: var(--gold); background: var(--gold-bg); }
+.sp-btn.act-jnj { border-color: var(--accent); background: var(--accent-bg); }
+.sp-ticker { font-size: 14px; font-weight: 700; color: var(--ink); display: block; margin-bottom: 3px; }
+.sp-name   { font-size: 10px; color: var(--ink-muted); display: block; margin-bottom: 2px; }
+.sp-sector { font-size: 10px; color: var(--ink-muted); }
+
+/* 결과 카드 */
+.result-card { border-radius: 14px; padding: 20px; margin: 14px 0; transition: all 0.25s; }
+.result-card.jpm { background: var(--purple-bg); border: 1.5px solid rgba(91,58,183,0.2); }
+.result-card.xom { background: var(--gold-bg); border: 1.5px solid rgba(166,124,0,0.2); }
+.result-card.jnj { background: var(--accent-bg); border: 1.5px solid rgba(45,106,79,0.2); }
+.rc-ticker { font-size: 12px; color: var(--ink-muted); font-weight: 600; margin-bottom: 10px; }
+.rc-amount { font-family: var(--font-mono); font-size: 34px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+.rc-pct    { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+.rc-vs     { padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.08); font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+.rc-verdict { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 8px; }
+.verdict-win  { background: var(--accent-bg); color: var(--accent); }
+.verdict-lose { background: var(--red-bg); color: var(--red); }
+
+/* 요약 그리드 2x2 */
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+.sg-item { background: var(--paper-warm); border-radius: 10px; padding: 14px 10px; text-align: center; border: 1.5px solid var(--border); }
+.sg-item.spy { border-color: var(--accent); background: var(--accent-bg); }
+.sg-item.win { border-color: var(--purple); background: var(--purple-bg); }
+.sg-ticker { font-size: 11px; font-weight: 700; color: var(--ink-muted); margin-bottom: 4px; }
+.sg-val    { font-family: var(--font-mono); font-size: 17px; font-weight: 700; margin-bottom: 3px; }
+.sg-pct    { font-size: 12px; font-weight: 600; }
+
+/* JPM vs WFC */
+.compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+.cr-item { border-radius: 12px; padding: 16px 14px; text-align: center; }
+.cr-item.win  { background: var(--purple-bg); border: 1.5px solid rgba(91,58,183,0.2); }
+.cr-item.lose { background: var(--red-bg); border: 1.5px solid rgba(193,18,31,0.2); }
+.cr-ticker { font-size: 13px; font-weight: 700; color: var(--ink-muted); margin-bottom: 4px; }
+.cr-name   { font-size: 11px; color: var(--ink-muted); margin-bottom: 10px; line-height: 1.4; }
+.cr-val    { font-family: var(--font-mono); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.cr-pct    { font-size: 13px; font-weight: 600; }
+
+/* 차트 */
+.legend-row { display: flex; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-soft); }
+.legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.chart-wrap  { position: relative; height: 220px; margin: 8px 0 10px; }
+
+/* 연도 버튼 */
+.yr-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; margin: 4px 0 10px; }
+.yr-btn { background: var(--paper-warm); border: 1px solid var(--border); border-radius: 7px; padding: 7px 4px; text-align: center; cursor: pointer; transition: all 0.15s; user-select: none; }
+.yr-btn:active { transform: scale(0.96); }
+.yr-btn.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.yr-btn-y    { font-size: 12px; font-weight: 600; display: block; margin-bottom: 1px; }
+.yr-btn-hint { font-size: 10px; color: var(--ink-muted); }
+.yr-btn.active .yr-btn-hint { color: rgba(248,247,243,0.4); }
+.yr-detail { background: var(--ink); border-radius: 12px; padding: 16px; color: var(--paper); margin-bottom: 4px; }
+.yd-year   { font-size: 11px; color: rgba(248,247,243,0.45); letter-spacing: 0.08em; margin-bottom: 10px; }
+.yd-grid   { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+.yd-item   { background: rgba(248,247,243,0.07); border-radius: 8px; padding: 10px 8px; text-align: center; }
+.yd-ticker { font-size: 10px; color: rgba(248,247,243,0.45); margin-bottom: 4px; font-weight: 600; }
+.yd-rate   { font-family: var(--font-mono); font-size: 16px; font-weight: 700; }
+.yd-bal    { font-size: 10px; color: rgba(248,247,243,0.4); margin-top: 3px; }
+.yd-hint   { font-size: 13px; color: rgba(248,247,243,0.3); text-align: center; padding: 8px 0; }
+
+/* 심리 부담 카드 */
+.burden-card { background: var(--ink); border-radius: 14px; padding: 20px; color: var(--paper); margin: 16px 0; }
+.bc-title { font-size: 13px; color: rgba(248,247,243,0.5); margin-bottom: 14px; }
+.bc-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(248,247,243,0.08); font-size: 13px; color: rgba(248,247,243,0.7); line-height: 1.6; }
+.bc-item:last-child { border-bottom: none; }
+.bc-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* Apple 비중 */
+.apple-card { background: var(--ink); border-radius: 16px; padding: 22px 20px; color: var(--paper); margin: 16px 0; }
+.ac-title { font-size: 13px; color: rgba(248,247,243,0.5); margin-bottom: 16px; }
+.ac-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ac-item  { background: rgba(248,247,243,0.07); border-radius: 10px; padding: 14px 12px; text-align: center; }
+.ac-label { font-size: 11px; color: rgba(248,247,243,0.45); margin-bottom: 6px; line-height: 1.4; }
+.ac-val   { font-family: var(--font-mono); font-size: 20px; font-weight: 700; line-height: 1.2; }
+.ac-sub   { font-size: 11px; margin-top: 3px; opacity: 0.55; }
+
+/* 결론 */
+.conclusion-card { background: var(--ink); border-radius: 16px; padding: 24px 20px; color: var(--paper); margin: 20px 0; }
+.cc-q { font-family: var(--font-serif); font-size: 17px; line-height: 1.5; margin-bottom: 14px; }
+.cc-a { font-size: 14px; color: rgba(248,247,243,0.6); line-height: 1.8; }
+
+/* 다음 챕터 */
+.next { background: var(--ink); color: var(--paper); padding: 36px 20px; text-align: center; }
+.next-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248,247,243,0.35); margin-bottom: 12px; }
+.next-q { font-family: var(--font-serif); font-size: 19px; line-height: 1.45; margin-bottom: 8px; }
+.next-hint { font-size: 13px; color: rgba(248,247,243,0.4); }
+
+/* 용어 */
+.term { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.term:last-child { border-bottom: none; }
+.term-word { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.term-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+
+.footer { padding: 24px 20px; text-align: center; font-size: 11px; color: var(--ink-muted); line-height: 1.7; border-top: 1px solid var(--border); }
+.prev-ch { display: block; text-align: center; padding: 14px; font-size: 13px; color: var(--ink-muted); border-bottom: 1px solid var(--border); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<a class="prev-ch" href="chapter2.html">← 목차로 돌아가기</a>
+
+<div class="hero">
+  <div class="hero-series">Stillwater · 에세이 시리즈 · 챕터 3</div>
+  <h1 class="hero-title">개별 주식을<br>고르면<br>더 낫지 않나요?</h1>
+  <p class="hero-sub">2015년 12월 31일,<br>당신이 볼 수 있었던 것부터 시작해요.</p>
+  <div class="hero-badge">📊 2015년 말 실제 시총 순위 · 1,000만원 기준</div>
+</div>
+
+<!-- 섹션 1: 2015년 말 상위 10위 -->
+<div class="section">
+  <div class="eyebrow">출발점</div>
+  <h2 class="sec-title">2015년 12월 31일,<br>당신이 볼 수 있었던 것</h2>
+  <p class="body">2016년 1월 2일에 투자를 결심했어요. 전날까지 볼 수 있었던 데이터는 2015년 연말 기준이에요. 미국 S&P 500 시가총액 상위 10개 기업 전체예요.</p>
+  <div class="rank-list" id="rankList"></div>
+  <div class="note">상위 10개 중 테크주가 이미 <strong>5개</strong>였어요. 나머지 5개는 에너지, 금융지주, 헬스케어, 금융이었어요.</div>
+</div>
+
+<!-- 섹션 2: 테크주 당시 분위기 -->
+<div class="section">
+  <div class="eyebrow">테크주를 제외한 이유</div>
+  <h2 class="sec-title">테크주가 잘될 것 같았지만<br>전 재산을 베팅할 수 있었을까요?</h2>
+  <p class="body">2015년 말에 "테크주가 잘될 것 같다"는 막연한 확신은 가질 수 있었어요. 그런데 그 확신이 있어도 1,000만원 전부를 Apple 하나에 넣을 수 있는 사람은 많지 않았어요. 당시 각 종목에 대한 시장의 시선이에요.</p>
+  <div class="mood-card"><div class="mood-ticker">🍎 Apple (1위)</div><div class="mood-desc">"아이폰 성장이 끝났다." 2015년 처음으로 아이폰 판매량 증가세가 꺾였어요. 성장이 끝난 회사라는 인식이 컸어요.</div></div>
+  <div class="mood-card"><div class="mood-ticker">🔍 Google (3위)</div><div class="mood-desc">"검색 하나로 언제까지 먹고살겠냐." EU 반독점 조사가 진행 중이었어요.</div></div>
+  <div class="mood-card"><div class="mood-ticker">💻 Microsoft (5위)</div><div class="mood-desc">"윈도우즈 회사가 클라우드를 할 수 있겠냐." 당시만 해도 회사 이전할 때 자체 서버를 직접 옮기던 시절이에요. 클라우드라는 개념이 일반 기업엔 아직 낯설었어요.</div></div>
+  <div class="mood-card"><div class="mood-ticker">📦 Amazon (6위)</div><div class="mood-desc">"이익도 없는데 왜 이렇게 비싸냐." PER이 수백 배를 넘었어요. 거품이라는 말이 항상 따라다녔어요.</div></div>
+  <div class="mood-card"><div class="mood-ticker">📱 Facebook (9위)</div><div class="mood-desc">"광고에만 의존하는 구조가 지속 가능한가." 모바일 광고 성장이 계속될지 의문이 있었어요.</div></div>
+
+  <div class="hl">
+    1,000만원을 Apple 하나에 넣고 10년간 팔지 않았다면 2025년 말 약 <strong>9,936만원</strong>이 됐어요.<br><br>
+    그런데 2015년 말에 그렇게 할 수 있는 사람이 얼마나 됐을까요. 맞을 수도 있어요. 하지만 전 재산을 베팅할 만큼 확신하기는 극히 어려웠어요.
+  </div>
+</div>
+
+<!-- 섹션 3: 비테크 5개 -->
+<div class="section">
+  <div class="eyebrow">남은 선택지</div>
+  <h2 class="sec-title">테크주를 빼면<br>무엇이 남나요?</h2>
+  <p class="body">테크주 5개를 제외하면 나머지 5개가 남아요.</p>
+  <div class="rank-list" id="nonTechList"></div>
+  <p class="body" style="margin-top:14px;">이 중에서 3개를 골랐어요. ExxonMobil, Johnson & Johnson, JPMorgan이에요. 2015년 말 기준으로 어떤 전문가에게 물어봐도 "좋은 회사"라고 했을 초우량 대형주들이에요.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px 0;">
+    <div style="background:var(--paper-warm); border-radius:10px; padding:14px; border:1.5px solid var(--border);">
+      <div style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:4px;">Berkshire Hathaway</div>
+      <div style="font-size:12px; color:var(--ink-muted); line-height:1.6;">워런 버핏의 복합지주사예요. 사실상 인덱스 펀드와 비슷한 성격이라 제외했어요.</div>
+    </div>
+    <div style="background:var(--paper-warm); border-radius:10px; padding:14px; border:1.5px solid var(--border);">
+      <div style="font-size:13px; font-weight:700; color:var(--ink); margin-bottom:4px;">Wells Fargo</div>
+      <div style="font-size:12px; color:var(--ink-muted); line-height:1.6;">JPMorgan과 같은 금융주였어요. 둘 중 어느 게 잘될지는 뒤에서 다룰게요.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 4: 종목 선택기 -->
+<div class="section">
+  <div class="eyebrow">직접 골라보기</div>
+  <h2 class="sec-title">1,000만원을 이 주식 중<br>하나에 넣었다면?</h2>
+  <p class="body">2016년 1월 2일, 1,000만원을 아래 종목 중 하나에 넣고 10년간 팔지 않았다면 어떻게 됐을까요?</p>
+
+  <div class="stock-picker">
+    <div class="sp-btn act-jpm" id="sp-jpm" onclick="selectStock('jpm')">
+      <span class="sp-ticker">JPM</span>
+      <span class="sp-name">JPMorgan</span>
+      <span class="sp-sector">금융 · 8위</span>
+    </div>
+    <div class="sp-btn" id="sp-xom" onclick="selectStock('xom')">
+      <span class="sp-ticker">XOM</span>
+      <span class="sp-name">ExxonMobil</span>
+      <span class="sp-sector">에너지 · 2위</span>
+    </div>
+    <div class="sp-btn" id="sp-jnj" onclick="selectStock('jnj')">
+      <span class="sp-ticker">JNJ</span>
+      <span class="sp-name">J&J</span>
+      <span class="sp-sector">헬스케어 · 7위</span>
+    </div>
+  </div>
+
+  <div class="result-card jpm" id="stockResultCard">
+    <div class="rc-ticker" id="rc-ticker">JPMorgan Chase · JPM · 금융 · 8위</div>
+    <div class="rc-amount" id="rc-amount" style="color:var(--purple);">7,960만원</div>
+    <div class="rc-pct"    id="rc-pct"    style="color:var(--purple);">+696.0%</div>
+    <div class="rc-vs" id="rc-vs">
+      S&P 500 인덱스(3,920만원 · +292%)와 비교:<br>
+      <div class="rc-verdict verdict-win" id="rc-verdict">✅ 인덱스를 이겼어요 (+4,040만원)</div>
+    </div>
+  </div>
+
+  <p class="body" style="font-size:13px; color:var(--ink-muted);">세 종목과 인덱스 최종 결과 (1,000만원 기준):</p>
+
+  <div class="summary-grid">
+    <div class="sg-item spy">
+      <div class="sg-ticker">📊 S&P 500 인덱스 인덱스 펀드</div>
+      <div class="sg-val" style="color:var(--accent);">3,920만원</div>
+      <div class="sg-pct" style="color:var(--accent);">+292%</div>
+    </div>
+    <div class="sg-item win">
+      <div class="sg-ticker">🏦 JPM</div>
+      <div class="sg-val" style="color:var(--purple);">7,960만원</div>
+      <div class="sg-pct" style="color:var(--purple);">+696%</div>
+    </div>
+    <div class="sg-item">
+      <div class="sg-ticker">🛢️ XOM</div>
+      <div class="sg-val" style="color:var(--gold);">1,730만원</div>
+      <div class="sg-pct" style="color:var(--gold);">+73%</div>
+    </div>
+    <div class="sg-item">
+      <div class="sg-ticker">💊 JNJ</div>
+      <div class="sg-val" style="color:var(--ink-soft);">2,330만원</div>
+      <div class="sg-pct" style="color:var(--ink-soft);">+133%</div>
+    </div>
+  </div>
+
+  <div class="warn">
+    <strong>3개 중 1개만 인덱스를 이겼어요.</strong><br>
+    XOM이 부진한 건 ExxonMobil이 나쁜 회사여서가 아니에요. 유가 사이클이 그렇게 흘렀기 때문이에요. JNJ도 마찬가지예요. 2015년에 아무도 몰랐어요.
+  </div>
+</div>
+
+<!-- 섹션 5: JPM vs WFC -->
+<div class="section">
+  <div class="eyebrow">같은 섹터, 다른 결과</div>
+  <h2 class="sec-title">JPMorgan과 Wells Fargo,<br>어느 게 잘될지 알 수 있었을까요?</h2>
+  <p class="body">2015년 말 기준으로 JPMorgan(8위)과 Wells Fargo(10위)는 둘 다 미국 최대 은행이었어요. 같은 금융 섹터, 같은 시총 상위권이었어요.</p>
+
+  <div class="compare-row">
+    <div class="cr-item win">
+      <div class="cr-ticker">JPM</div>
+      <div class="cr-name">JPMorgan Chase<br>8위</div>
+      <div class="cr-val" style="color:var(--purple);">7,960만원</div>
+      <div class="cr-pct" style="color:var(--purple);">+696%</div>
+    </div>
+    <div class="cr-item lose">
+      <div class="cr-ticker">WFC</div>
+      <div class="cr-name">Wells Fargo<br>10위</div>
+      <div class="cr-val" style="color:var(--red);">1,300만원</div>
+      <div class="cr-pct" style="color:var(--red);">+30%</div>
+    </div>
+  </div>
+
+  <div class="note">
+    Wells Fargo는 2016년에 수백만 개의 유령 계좌를 개설한 대규모 스캔들이 터졌어요. 2015년 말에 이걸 예상할 수 있는 사람은 없었어요.<br><br>
+    같은 금융주, 같은 상위권, 그런데 10년 후 결과가 6배 가까이 달랐어요.
+  </div>
+</div>
+
+<!-- 섹션 6: 연도별 차트 -->
+<div class="section">
+  <div class="eyebrow">10년 흐름</div>
+  <h2 class="sec-title">연도별로 실제<br>어떤 일이 있었나요?</h2>
+  <p class="body">연도 버튼을 터치해서 그 해에 어떤 일이 있었는지 확인해보세요.</p>
+
+  <div class="legend-row">
+    <div class="legend-item"><div class="legend-dot" style="background:#52B788;"></div>S&P 500</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5B3AB7;"></div>JPM</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#A67C00;"></div>XOM</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3B7A57;"></div>JNJ</div>
+  </div>
+
+  <div class="chart-wrap">
+    <canvas id="stockChart" role="img" aria-label="S&P 500 인덱스·JPM·XOM·JNJ 10년 잔액 비교 라인 차트. 1,000만원 기준."></canvas>
+  </div>
+
+  <div class="yr-grid" id="yrGrid"></div>
+  <div class="yr-detail" id="yrDetail"><div class="yd-hint">연도 버튼을 터치해보세요</div></div>
+</div>
+
+<!-- 섹션 7: 개별주의 심리 부담 -->
+<div class="section">
+  <div class="eyebrow">개별주의 진짜 부담</div>
+  <h2 class="sec-title">주가가 내릴 때마다<br>이 질문이 반복돼요</h2>
+
+  <p class="body">개별주를 보유하는 동안 끊임없이 판단해야 해요. 숫자가 움직일 때마다 이런 생각이 들어요.</p>
+
+  <div class="burden-card">
+    <div class="bc-title">📉 주가가 내릴 때</div>
+    <div class="bc-item"><span class="bc-icon">🤔</span><div>내 판단이 혹시 틀린 게 아닐까? 회사에 문제가 생긴 건가, 아니면 시장 전체가 빠지는 건가?</div></div>
+    <div class="bc-item"><span class="bc-icon">⏳</span><div>한 달 후에 오를까? 1년 후에도 계속 하락할까? 지금 파는 게 맞을까, 더 들고 있어야 할까?</div></div>
+    <div class="bc-item"><span class="bc-icon">🔄</span><div>지금 팔고 다른 주식으로 갈아타야 하는 건 아닐까? 갈아탔다가 원래 주식이 오르면 어떡하지?</div></div>
+  </div>
+
+  <div class="burden-card" style="margin-top:8px;">
+    <div class="bc-title">📈 주가가 오를 때</div>
+    <div class="bc-item"><span class="bc-icon">💭</span><div>지금이 고점인가? 여기서 팔아야 하나, 아니면 더 올라가나?</div></div>
+    <div class="bc-item"><span class="bc-icon">📊</span><div>고점마다 팔고, 저점이 되면 다시 사는 게 맞는 방법인가? 그 타이밍을 어떻게 아나?</div></div>
+    <div class="bc-item"><span class="bc-icon">😰</span><div>팔았다가 계속 올라가면? 안 팔았다가 떨어지면? 끊임없이 갈등해야 해요.</div></div>
+  </div>
+
+  <p class="body" style="margin-top:16px;">이 모든 판단을 <strong>본업이 있는 상태에서</strong>, 분기마다 실적 발표를 확인하면서, 뉴스를 팔로우하면서 해야 해요.</p>
+
+  <div class="warn">
+    미국 액티브 펀드(전문가가 직접 종목을 골라 운용하는 펀드)의 약 <strong>80~90%</strong>가 10년 기준으로 인덱스 펀드 수익률을 밑돌았어요. 이 갈등을 전업으로 하는 전문가도 이기기 어려운 게임이에요.
+  </div>
+</div>
+
+<!-- 섹션 8: 그 생각 자체가 함정 -->
+<div class="section">
+  <div class="eyebrow">핵심 통찰</div>
+  <h2 class="sec-title">"나라면 다른 조합을<br>골랐을 것 같은데..."</h2>
+
+  <p class="body">이 챕터를 읽으면서 아마 이런 생각이 드셨을 거예요.</p>
+
+  <div style="background:var(--paper-warm); border-radius:12px; padding:18px 16px; margin:16px 0; border:1.5px solid var(--border);">
+    <div style="font-size:14px; color:var(--ink-soft); line-height:1.9;">
+      "나라면 Amazon을 하나 골랐을 것 같은데..."<br>
+      "테크주 하나랑 비테크 둘을 섞으면 어떨까?"<br>
+      "JPM 대신 WFC를 골랐다면?"
+    </div>
+  </div>
+
+  <p class="body"><strong>그 생각이 드는 순간, 이미 개별주 선택의 함정에 들어온 거예요.</strong></p>
+  <p class="body">어떤 조합이 맞는지, 어떤 비율이 맞는지를 계속 고민하게 돼요. 오르면 "더 살걸", 내리면 "팔아야 하나"가 반복돼요. 처음엔 3종목이었는데 어느새 5개, 7개로 늘어나요. 어느 것도 제대로 보지 못하게 되죠.</p>
+</div>
+
+<!-- 섹션 9: 인덱스 펀드의 답 -->
+<div class="section">
+  <div class="eyebrow">인덱스 펀드의 답</div>
+  <h2 class="sec-title">인덱스 펀드는<br>이 문제를 어떻게 푸나요?</h2>
+
+  <p class="body">인덱스 펀드는 JPM이 잘될지, XOM이 잘될지 고르지 않아요. <strong>셋 다 사요.</strong> 500개 기업을 비중에 맞게 동시에 사요.</p>
+  <p class="body">그리고 주가가 내려도 "내 판단이 틀렸나"를 고민하지 않아도 돼요. 시장 전체가 빠진 거니까요. 역사적으로 항상 회복했다는 하나의 근거만 있으면 버틸 수 있어요.</p>
+
+  <div class="apple-card">
+    <div class="ac-title">🍎 1,000만원을 S&P 500 인덱스 펀드에 넣었을 때 Apple 비중 (2015년 말 기준)</div>
+    <div class="ac-grid">
+      <div class="ac-item">
+        <div class="ac-label">S&P 500 내 Apple 비중</div>
+        <div class="ac-val" style="color:var(--accent-light);">약 3.5%</div>
+        <div class="ac-sub" style="color:rgba(248,247,243,0.5);">1,000만원 중 35만원</div>
+      </div>
+      <div class="ac-item">
+        <div class="ac-label">그 35만원의<br>10년 후 가치</div>
+        <div class="ac-val" style="color:var(--accent-light);">약 383만원</div>
+        <div class="ac-sub" style="color:rgba(248,247,243,0.5);">Apple을 고르지 않아도</div>
+      </div>
+    </div>
+    <div style="margin-top:14px; font-size:12px; color:rgba(248,247,243,0.45); line-height:1.7;">
+      나머지 965만원도 499개 기업에 분산돼서 굴러갔어요.<br>
+      JPM이 +696%가 됐을 때, 그 수익의 일부도 자동으로 내 것이 됐어요.
+    </div>
+  </div>
+
+  <div class="hl">
+    인덱스 펀드는 "어느 주식이 잘될지 맞히는 게임"에서 벗어나게 해줘요.<br><br>
+    대신 하나의 믿음만 있으면 돼요.<br>
+    <strong>"미국 경제 전체가 10년 후에 지금보다 성장해 있을 것이다."</strong>
+  </div>
+</div>
+
+<!-- 다음 챕터 -->
+<div class="next">
+  <div class="next-label">다음 · 챕터 4<a href="chapter4.html" style="display:inline-block;margin-top:20px;background:#52B788;color:#F8F7F3;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;">다음으로 →</a></div>
+  <div class="next-q">"그럼 얼마를 넣어야<br>의미가 있는 건가요?"</div>
+  <div class="next-hint" style="margin-top:8px;">복리는 넣은 돈에만 작동해요</div>
+</div>
+
+<!-- 용어 정리 -->
+<div class="section">
+  <div class="eyebrow">용어 정리</div>
+  <div class="term">
+    <div class="term-word">시가총액</div>
+    <div class="term-desc">기업의 주가에 발행 주식 수를 곱한 값이에요. 시장이 그 기업을 얼마로 평가하는지 나타내요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">배당 재투자 포함 총수익률</div>
+    <div class="term-desc">주가 상승분과 배당금 재투자를 모두 포함한 실제 수익률이에요. 이 챕터의 모든 수익률은 이 기준이에요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">액티브 펀드</div>
+    <div class="term-desc">펀드매니저가 직접 종목을 골라 운용하는 펀드예요. 수수료가 인덱스 펀드보다 높고, 장기적으로 인덱스를 이기는 경우가 드물어요.</div>
+  </div>
+</div>
+
+
+<div style="padding:20px;text-align:center;border-top:1px solid #DDDAD0;background:#F8F7F3;">
+  <a href="index.html" style="display:inline-block;padding:12px 24px;background:#1C1C2E;color:#F8F7F3;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;">☰ 목차로</a>
+</div>
+<div class="footer">
+  © Stillwater Investment Essays<br>
+  본 콘텐츠의 무단 복제 및 배포를 금합니다.<br>
+  <span style="display:block; margin-top:4px;">투자 결과의 책임은 본인에게 있습니다.</span>
+</div>
+
+<script>
+// ── 1,000만원 기준으로 통일 ──
+const BASE = 10000000;
+const YRS  = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const SPY_R = [12.00,21.70,-4.56,31.22,18.37,28.75,-18.17,26.19,24.89,17.72];
+const JPM_R = [30.74,26.76,-6.62,47.25,-5.53,27.75,-12.64,30.63,44.29,37.27];
+const XOM_R = [-0.28,-3.84,-14.59,2.30,-35.93,57.40,87.41,-6.26,11.26,15.98];
+const JNJ_R = [16.24,19.15,5.87,16.43,10.91,10.68,5.97,-8.58,-4.81,47.48];
+const AAPL_R= [10.03,46.11,-5.39,88.98,80.75,34.65,-26.40,49.01,30.71,9.05];
+const EVENTS= {
+  2016:"트럼프 당선. Wells Fargo 계좌 스캔들 터짐.",
+  2017:"글로벌 동반 상승.",
+  2018:"미중 무역전쟁. 금리 인상. 유가 급락.",
+  2019:"미중 협상 기대. 강한 반등.",
+  2020:"코로나 팬데믹. XOM -36%. V자 회복.",
+  2021:"백신·유동성. 유가 회복으로 XOM 급등.",
+  2022:"금리 급등. 러-우 전쟁. XOM +87% 에너지 대란.",
+  2023:"AI 붐. JNJ -8%.",
+  2024:"금리 인하. AI 투자 확대.",
+  2025:"AI 수혜 지속. JNJ +47% 반등."
+};
+
+function calcBal(rates, init){
+  let arr=[init], v=init;
+  rates.forEach(r=>{ v=v*(1+r/100); arr.push(Math.round(v)); });
+  return arr;
+}
+const spyBal  = calcBal(SPY_R,  BASE);
+const jpmBal  = calcBal(JPM_R,  BASE);
+const xomBal  = calcBal(XOM_R,  BASE);
+const jnjBal  = calcBal(JNJ_R,  BASE);
+const aaplBal = calcBal(AAPL_R, BASE);
+
+function fw(v){ return Math.round(v/10000).toLocaleString()+'만원'; }
+function fp(v,b){ const p=((v-b)/b*100).toFixed(1); return (v>=b?'+':'')+p+'%'; }
+
+// ── 상위 10위 리스트 ──
+const top10 = [
+  {rank:1, name:'Apple', ticker:'AAPL', sector:'테크·소비자전자', type:'tech'},
+  {rank:2, name:'ExxonMobil', ticker:'XOM', sector:'에너지', type:'sel'},
+  {rank:3, name:'Google (Alphabet)', ticker:'GOOGL', sector:'테크·인터넷', type:'tech'},
+  {rank:4, name:'Berkshire Hathaway', ticker:'BRK', sector:'금융지주', type:'skip'},
+  {rank:5, name:'Microsoft', ticker:'MSFT', sector:'테크·소프트웨어', type:'tech'},
+  {rank:6, name:'Amazon', ticker:'AMZN', sector:'테크·유통', type:'tech'},
+  {rank:7, name:'Johnson & Johnson', ticker:'JNJ', sector:'헬스케어', type:'sel'},
+  {rank:8, name:'JPMorgan Chase', ticker:'JPM', sector:'금융', type:'sel'},
+  {rank:9, name:'Facebook', ticker:'META', sector:'테크·소셜미디어', type:'tech'},
+  {rank:10, name:'Wells Fargo', ticker:'WFC', sector:'금융', type:'skip'},
+];
+
+function renderRankList(containerId, items){
+  const el = document.getElementById(containerId);
+  items.forEach(d=>{
+    const div = document.createElement('div');
+    div.className='rank-item'+(d.type==='tech'?' tech':d.type==='sel'?' selected':' dimmed');
+    const bt = d.type==='tech'?'테크주':d.type==='sel'?'비교 대상':'제외';
+    const bc = d.type==='tech'?'badge-tech':d.type==='sel'?'badge-sel':'badge-skip';
+    div.innerHTML=`<span class="rank-num">${d.rank}</span><div style="flex:1;"><div class="rank-name">${d.name} <span style="color:var(--ink-muted);font-weight:400;font-size:12px;">${d.ticker}</span></div><div class="rank-sector">${d.sector}</div></div><span class="rank-badge ${bc}">${bt}</span>`;
+    el.appendChild(div);
+  });
+}
+renderRankList('rankList', top10);
+renderRankList('nonTechList', top10.filter(d=>d.type!=='tech'));
+
+// ── 종목 선택기 ──
+const SPY_FINAL = spyBal[10];
+const STOCKS = {
+  jpm:{ label:'JPMorgan Chase · JPM · 금융 · 8위', bal:jpmBal, color:'var(--purple)', cls:'jpm', actCls:'act-jpm' },
+  xom:{ label:'ExxonMobil · XOM · 에너지 · 2위',   bal:xomBal, color:'var(--gold)',   cls:'xom', actCls:'act-xom' },
+  jnj:{ label:'Johnson & Johnson · JNJ · 헬스케어 · 7위', bal:jnjBal, color:'var(--accent)', cls:'jnj', actCls:'act-jnj' },
+};
+
+function selectStock(s){
+  ['jpm','xom','jnj'].forEach(k=>{
+    document.getElementById('sp-'+k).className='sp-btn'+(k===s?' '+STOCKS[k].actCls:'');
+  });
+  const sd=STOCKS[s];
+  const final=sd.bal[10];
+  const win=final>=SPY_FINAL;
+  const diff=Math.abs(final-SPY_FINAL);
+  document.getElementById('stockResultCard').className='result-card '+sd.cls;
+  document.getElementById('rc-ticker').textContent=sd.label;
+  document.getElementById('rc-amount').textContent=fw(final);
+  document.getElementById('rc-amount').style.color=sd.color;
+  document.getElementById('rc-pct').textContent=fp(final,BASE);
+  document.getElementById('rc-pct').style.color=sd.color;
+  document.getElementById('rc-vs').innerHTML=`S&P 500 인덱스(${fw(SPY_FINAL)} · +292%)와 비교:<br><div class="rc-verdict ${win?'verdict-win':'verdict-lose'}" style="margin-top:8px;">${win?'✅ 인덱스를 이겼어요 (+'+fw(diff)+')':'❌ 인덱스에 졌어요 (-'+fw(diff)+')'}</div>`;
+}
+
+// ── 라인 차트 ──
+const ctx = document.getElementById('stockChart').getContext('2d');
+new Chart(ctx,{
+  type:'line',
+  data:{
+    labels:['시작',...YRS.map(String)],
+    datasets:[
+      {label:'SPY', data:spyBal, borderColor:'#52B788', backgroundColor:'rgba(82,183,136,0.06)', borderWidth:2.5, pointRadius:2.5, fill:true, tension:0.3},
+      {label:'JPM', data:jpmBal, borderColor:'#5B3AB7', borderWidth:2, pointRadius:2.5, fill:false, tension:0.3},
+      {label:'XOM', data:xomBal, borderColor:'#A67C00', borderWidth:2, pointRadius:2.5, fill:false, tension:0.3, borderDash:[4,3]},
+      {label:'JNJ', data:jnjBal, borderColor:'#3B7A57', borderWidth:2, pointRadius:2.5, fill:false, tension:0.3, borderDash:[6,3]},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fw(c.raw)}}
+    },
+    scales:{
+      y:{ticks:{callback:v=>Math.round(v/10000).toLocaleString()+'만', font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'}},
+      x:{ticks:{font:{size:10}, autoSkip:true, maxTicksLimit:6}, grid:{display:false}}
+    }
+  }
+});
+
+// ── 연도 버튼 ──
+const yrGrid=document.getElementById('yrGrid');
+const yrDetail=document.getElementById('yrDetail');
+let activeYr=-1;
+YRS.forEach((yr,i)=>{
+  const btn=document.createElement('div');
+  btn.className='yr-btn';
+  btn.innerHTML=`<span class="yr-btn-y">${yr}</span><span class="yr-btn-hint">터치</span>`;
+  btn.addEventListener('click',()=>{
+    if(activeYr===i){
+      yrDetail.innerHTML='<div class="yd-hint">연도 버튼을 터치해보세요</div>';
+      btn.classList.remove('active'); activeYr=-1; return;
+    }
+    document.querySelectorAll('.yr-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); activeYr=i;
+    const items=[
+      {ticker:'SPY', rate:SPY_R[i], bal:spyBal[i+1], color:'#52B788'},
+      {ticker:'JPM', rate:JPM_R[i], bal:jpmBal[i+1], color:'#A0A0FF'},
+      {ticker:'XOM', rate:XOM_R[i], bal:xomBal[i+1], color:'#F4A261'},
+      {ticker:'JNJ', rate:JNJ_R[i], bal:jnjBal[i+1], color:'#52B788'},
+    ];
+    yrDetail.innerHTML=`
+      <div class="yd-year">${yr}년 수익률 · ${EVENTS[yr]}</div>
+      <div class="yd-grid">
+        ${items.map(d=>`<div class="yd-item"><div class="yd-ticker">${d.ticker}</div><div class="yd-rate" style="color:${d.rate>=0?d.color:'#FF8A8A'};">${d.rate>0?'+':''}${d.rate.toFixed(1)}%</div><div class="yd-bal">${fw(d.bal)}</div></div>`).join('')}
+      </div>
+    `;
+  });
+  yrGrid.appendChild(btn);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>챕터 6 — 어느 시장을 믿을 것인가 | Stillwater</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --ink: #1C1C2E; --ink-soft: #4A4A6A; --ink-muted: #9090AA;
+  --paper: #F8F7F3; --paper-warm: #EFECE4;
+  --accent: #2D6A4F; --accent-light: #52B788; --accent-bg: #D8F3DC;
+  --red: #C1121F; --red-bg: #FFE5E7;
+  --gold: #A67C00; --gold-bg: #FFF8E1;
+  --purple: #5B3AB7; --purple-bg: #EDE9FF;
+  --border: #DDDAD0;
+  --font-serif: 'Georgia', serif;
+  --font-sans: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', monospace;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-sans); background: var(--paper); color: var(--ink); line-height: 1.7; font-size: 15px; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+
+.hero { background: var(--ink); color: var(--paper); padding: 52px 24px 44px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 180px; height: 180px; border-radius: 50%; background: var(--purple); opacity: 0.1; }
+.hero-series { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 14px; font-weight: 600; position: relative; z-index: 1; }
+.hero-title { font-family: var(--font-serif); font-size: 27px; line-height: 1.3; margin-bottom: 14px; font-weight: normal; position: relative; z-index: 1; }
+.hero-sub { font-size: 14px; color: rgba(248,247,243,0.6); line-height: 1.65; position: relative; z-index: 1; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; background: rgba(82,183,136,0.15); border: 1px solid rgba(82,183,136,0.3); border-radius: 20px; padding: 5px 12px; font-size: 11px; color: var(--accent-light); position: relative; z-index: 1; }
+
+.section { padding: 32px 20px; border-bottom: 1px solid var(--border); }
+.eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; margin-bottom: 8px; }
+.sec-title { font-family: var(--font-serif); font-size: 21px; line-height: 1.4; margin-bottom: 16px; color: var(--ink); font-weight: normal; }
+.body { font-size: 15px; color: var(--ink-soft); line-height: 1.78; margin-bottom: 14px; }
+.body strong { color: var(--ink); font-weight: 600; }
+.hl { background: var(--accent-bg); border-left: 3px solid var(--accent); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.warn { background: var(--red-bg); border-left: 3px solid var(--red); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.note { background: var(--gold-bg); border-left: 3px solid var(--gold); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+
+/* 시장 비교 카드 */
+.market-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 16px 0; }
+.mk-item { border-radius: 12px; padding: 16px 14px; border: 1.5px solid var(--border); background: var(--paper-warm); }
+.mk-item.best { background: var(--accent-bg); border-color: rgba(45,106,79,0.3); }
+.mk-item.mid  { background: var(--gold-bg);   border-color: rgba(166,124,0,0.3); }
+.mk-item.bad  { background: var(--red-bg);    border-color: rgba(193,18,31,0.3); }
+.mk-name  { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.mk-ret   { font-family: var(--font-mono); font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.mk-desc  { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
+
+/* 일본 횡보 테이블 */
+.japan-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+.japan-table th { background: var(--paper-warm); padding: 9px 10px; text-align: left; font-size: 11px; font-weight: 700; color: var(--ink-muted); border-bottom: 1px solid var(--border); }
+.japan-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--ink-soft); vertical-align: middle; }
+.japan-table tr:last-child td { border-bottom: none; }
+.japan-table .yr  { font-weight: 600; color: var(--ink); }
+.japan-table .val { font-family: var(--font-mono); font-weight: 600; }
+.japan-table .neg { color: var(--red); }
+.japan-table .pos { color: var(--accent); }
+.japan-table .neu { color: var(--gold); }
+
+/* 차트 */
+.legend-row { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-soft); }
+.legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.chart-wrap  { position: relative; height: 220px; margin: 8px 0 6px; }
+.chart-note  { font-size: 11px; color: var(--ink-muted); text-align: center; }
+
+/* 구조적 강점 카드 */
+.strength-list { margin: 16px 0; }
+.sl-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.sl-item:last-child { border-bottom: none; }
+.sl-icon  { font-size: 20px; flex-shrink: 0; }
+.sl-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.sl-desc  { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+
+/* 다음 챕터 */
+.next { background: var(--ink); color: var(--paper); padding: 36px 20px; text-align: center; }
+.next-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248,247,243,0.35); margin-bottom: 12px; }
+.next-q { font-family: var(--font-serif); font-size: 19px; line-height: 1.45; margin-bottom: 8px; }
+.next-hint { font-size: 13px; color: rgba(248,247,243,0.4); }
+
+.term { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.term:last-child { border-bottom: none; }
+.term-word { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.term-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+.footer { padding: 24px 20px; text-align: center; font-size: 11px; color: var(--ink-muted); line-height: 1.7; border-top: 1px solid var(--border); }
+.prev-ch { display: block; text-align: center; padding: 14px; font-size: 13px; color: var(--ink-muted); border-bottom: 1px solid var(--border); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<a class="prev-ch" href="chapter5.html">← 목차로 돌아가기</a>
+
+<div class="hero">
+  <div class="hero-series">Stillwater · 에세이 시리즈 · 챕터 6</div>
+  <h1 class="hero-title">어느 시장을<br>믿을<br>것인가</h1>
+  <p class="hero-sub">같은 전략인데 왜<br>결과가 이렇게 다를까요?</p>
+  <div class="hero-badge">📊 실제 시장 데이터 비교</div>
+</div>
+
+<!-- 섹션 1: 같은 전략, 다른 결과 -->
+<div class="section">
+  <div class="eyebrow">출발점</div>
+  <h2 class="sec-title">같은 전략인데<br>왜 결과가 다를까요?</h2>
+
+  <p class="body">챕터 1~5에서 배운 전략을 그대로 적용했어요. 사고 안 팔고 들고만 있었어요. 그런데 어느 나라 인덱스 펀드를 샀느냐에 따라 결과가 완전히 달라져요.</p>
+  <p class="body">같은 기간, 같은 금액, 같은 전략. 차이는 시장 하나예요.</p>
+
+  <div class="market-grid">
+    <div class="mk-item best">
+      <div class="mk-name">🇺🇸 미국 S&P 500 인덱스</div>
+      <div class="mk-ret" style="color:var(--accent);">+292%</div>
+      <div class="mk-desc">2016~2025년 · 1,000만원 → 3,920만원</div>
+    </div>
+    <div class="mk-item mid">
+      <div class="mk-name">🇰🇷 한국 코스피 인덱스</div>
+      <div class="mk-ret" style="color:var(--gold);">+54%</div>
+      <div class="mk-desc">2016~2025년 · 1,000만원 → 1,540만원</div>
+    </div>
+    <div class="mk-item bad">
+      <div class="mk-name">🇯🇵 일본 닛케이 인덱스</div>
+      <div class="mk-ret" style="color:var(--red);">35년 후 본전</div>
+      <div class="mk-desc">1989년 고점 → 2024년에야 회복</div>
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 2: 미국 시장의 구조적 강점 -->
+<div class="section">
+  <div class="eyebrow">미국 시장</div>
+  <h2 class="sec-title">미국 시장이<br>우상향해온 이유</h2>
+
+  <p class="body">운이 좋아서가 아니에요. 구조적인 이유가 있어요. 그리고 미국 시장도 장기 침체를 여러 번 겪었어요. 대공황, 닷컴버블, 금융위기. 그런데 다른 나라와 비교했을 때 침체 후 회복하는 기간이 상대적으로 짧았어요.</p>
+
+  <p class="body">일본이 35년이 걸린 것을, 미국은 같은 금융위기에서 4~7년 안에 회복했어요. 이 회복력의 차이가 장기 투자자에게 결정적이에요.</p>
+
+  <div class="strength-list">
+    <div class="sl-item">
+      <div class="sl-icon">🔄</div>
+      <div>
+        <div class="sl-title">자동 구조조정 시스템</div>
+        <div class="sl-desc">S&P 500은 매년 부진한 기업을 퇴출하고 성장 기업을 편입해요. 지수 자체가 계속 진화해요. 1990년대에 없었던 애플·아마존·엔비디아가 지금은 상위 종목이에요.</div>
+      </div>
+    </div>
+    <div class="sl-item">
+      <div class="sl-icon">💵</div>
+      <div>
+        <div class="sl-title">달러가 기축통화</div>
+        <div class="sl-desc">위기 때마다 전 세계 자본이 미국으로 몰려요. 불안할수록 안전자산인 달러를 찾는 구조예요.</div>
+      </div>
+    </div>
+    <div class="sl-item">
+      <div class="sl-icon">🌍</div>
+      <div>
+        <div class="sl-title">전 세계에서 돈을 벌어요</div>
+        <div class="sl-desc">미국 기업들의 수익 상당 부분이 해외에서 나와요. 미국 국내 경기가 나빠도 글로벌 수익이 버텨줘요.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 3: 한국 시장 박스피 -->
+<div class="section">
+  <div class="eyebrow">한국 시장</div>
+  <h2 class="sec-title">"박스피"라는<br>별명이 생긴 이유</h2>
+
+  <p class="body">코스피 인덱스 펀드가 나쁜 상품이 아니에요. 다만 "장기적으로 우상향한다"는 역사적 근거가 아직 충분히 쌓이지 않았어요.</p>
+
+  <p class="body">"박스피"라는 별명이 생긴 이유가 있어요. 오르고 내리고를 반복하지만 결국 제자리인 구간이 길었기 때문이에요. 후퇴와 전진을 장시간 반복하면서 실질적인 우상향이 이뤄지지 않았던 시기가 있었어요. 복리가 작동하려면 원금이 불어나야 하는데, 그 원금이 제자리를 맴돌았어요.</p>
+
+  <div class="legend-row">
+    <div class="legend-item"><div class="legend-dot" style="background:#52B788;"></div>미국 S&P 500</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#A67C00;"></div>한국 코스피</div>
+  </div>
+  <div class="chart-wrap">
+    <canvas id="marketChart" role="img" aria-label="미국 S&P 500 vs 한국 코스피 수익률 비교 라인 차트"></canvas>
+  </div>
+  <div class="chart-note">2016~2025년 · 1,000만원 기준 누적 잔액</div>
+</div>
+
+<!-- 섹션 4: 일본의 교훈 -->
+<div class="section">
+  <div class="eyebrow">일본이 보여준 것</div>
+  <h2 class="sec-title">35년을 기다린<br>결과</h2>
+
+  <p class="body">"장기 투자하면 무조건 오른다"는 말이 틀릴 수 있다는 걸 가장 극단적으로 보여준 사례예요.</p>
+  <p class="body">1989년 말 닛케이 고점에 1,000만원을 넣었다면 이렇게 됐어요.</p>
+
+  <table class="japan-table">
+    <thead>
+      <tr><th>시점</th><th>잔액</th><th>상황</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="yr">1989년 말</td><td class="val">1,000만원</td><td style="font-size:12px; color:var(--ink-muted);">투자 시작</td></tr>
+      <tr><td class="yr">2003년</td><td class="val neg">약 250만원</td><td style="font-size:12px; color:var(--red);">-75% 하락</td></tr>
+      <tr><td class="yr">2009년</td><td class="val neg">약 200만원</td><td style="font-size:12px; color:var(--red);">금융위기 추가 하락</td></tr>
+      <tr><td class="yr">2024년</td><td class="val pos">약 1,050만원</td><td style="font-size:12px; color:var(--accent);">35년 만에 겨우 회복</td></tr>
+    </tbody>
+  </table>
+
+  <p class="body">35년 동안 들고 있었는데 수익률 거의 0%예요. 같은 기간 미국 S&P 500은 약 2,000% 이상 상승했어요.</p>
+
+  <div class="warn">
+    <strong>인덱스 펀드의 약점 2 — 어느 시장이냐가 잘못되면 수십 년을 기다려도 소용없어요.</strong><br><br>
+    일본이 그 증거예요. 인덱스 펀드는 무조건 오르는 게 아니에요. 성장한다는 역사적 근거가 있는 시장의 인덱스 펀드를 골라야 해요.
+  </div>
+</div>
+
+<!-- 섹션 5: 그렇다면 -->
+<div class="section">
+  <div class="eyebrow">결론</div>
+  <h2 class="sec-title">그렇다면<br>어떻게 해야 하나요?</h2>
+
+  <p class="body">이 에세이가 미국 S&P 500 인덱스를 중심에 둔 이유가 여기 있어요. 가장 강한 역사적 근거가 있는 시장이기 때문이에요.</p>
+
+  <p class="body">단, 미국 S&P 500도 2000~2013년까지 약 13년을 횡보했어요. 챕터 4에서 말씀드린 것처럼 투자 지평이 충분히 길어야 한다는 이유가 여기 있어요.</p>
+
+  <div class="hl">
+    "인덱스 펀드는 무조건 오른다"가 아니에요.<br><br>
+    <strong>성장한다는 역사적 근거가 있는 시장의 인덱스 펀드를 충분히 긴 시간 동안 보유할 때</strong> 작동해요.<br><br>
+    그 두 가지 조건이 맞지 않으면 인덱스 펀드도 답이 아니에요.
+  </div>
+
+  <p class="body">한국에서도 미국 인덱스에 투자할 수 있어요. 국내 증권사 해외주식 계좌에서 S&P 500을 추종하는 상품을 원화로 살 수 있어요. 구체적인 상품은 부록에서 다룰게요.</p>
+</div>
+
+<!-- 다음 챕터 -->
+<div class="next">
+  <div class="next-label">마지막 챕터 · 챕터 7<a href="chapter7.html" style="display:inline-block;margin-top:20px;background:#52B788;color:#F8F7F3;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;">다음으로 →</a></div>
+  <div class="next-q">"그래서 지금<br>시작해야 하는 이유가<br>뭔가요?"</div>
+  <div class="next-hint" style="margin-top:8px;">복리는 시간에 베팅하는 게임이에요</div>
+</div>
+
+<!-- 용어 정리 -->
+<div class="section">
+  <div class="eyebrow">용어 정리</div>
+  <div class="term">
+    <div class="term-word">박스피</div>
+    <div class="term-desc">한국 코스피 시장이 오르고 내리기를 반복하면서도 박스권(일정 범위) 안에서 맴돌던 현상을 가리키는 말이에요. 장기간 실질적인 우상향이 이뤄지지 않았던 시기가 있었어요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">기축통화</div>
+    <div class="term-desc">국제 거래에서 기준이 되는 통화예요. 현재 미국 달러가 기축통화예요. 전 세계 무역과 금융 거래의 상당 부분이 달러로 이뤄지기 때문에 위기 때 달러 수요가 높아지고 미국으로 자본이 몰리는 경향이 있어요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">코리아 디스카운트</div>
+    <div class="term-desc">한국 기업들이 비슷한 실적에도 불구하고 해외 기업보다 낮은 주가를 받는 현상이에요. 지배구조 문제, 지정학적 리스크, 소수 대형주 편중 등이 원인으로 꼽혀요.</div>
+  </div>
+</div>
+
+
+<div style="padding:20px;text-align:center;border-top:1px solid #DDDAD0;background:#F8F7F3;">
+  <a href="index.html" style="display:inline-block;padding:12px 24px;background:#1C1C2E;color:#F8F7F3;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;">☰ 목차로</a>
+</div>
+<div class="footer">
+  © Stillwater Investment Essays<br>
+  본 콘텐츠의 무단 복제 및 배포를 금합니다.<br>
+  <span style="display:block; margin-top:4px;">투자 결과의 책임은 본인에게 있습니다.</span>
+</div>
+
+<script>
+// 미국 vs 한국 누적 수익률 (연간 기준 근사값)
+const US_R  = [12.00, 21.70, -4.56, 31.22, 18.37, 28.75, -18.17, 26.19, 24.89, 17.72];
+const KR_R  = [3.32, 21.76, -17.28, 7.67, 30.75, 3.63, -24.89, 18.73, -9.63, 20.41];
+const YRS   = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const BASE  = 10000000;
+
+function calcBal(rates, init){
+  let arr=[init], v=init;
+  rates.forEach(r=>{ v=v*(1+r/100); arr.push(Math.round(v)); });
+  return arr;
+}
+const usBal = calcBal(US_R, BASE);
+const krBal = calcBal(KR_R, BASE);
+
+function fw(v){ return Math.round(v/10000).toLocaleString()+'만원'; }
+
+const ctx = document.getElementById('marketChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['시작', ...YRS.map(String)],
+    datasets: [
+      { label:'미국 S&P 500', data:usBal, borderColor:'#52B788', backgroundColor:'rgba(82,183,136,0.07)', borderWidth:2.5, pointRadius:3, fill:true, tension:0.3 },
+      { label:'한국 코스피', data:krBal, borderColor:'#A67C00', borderWidth:2, pointRadius:3, fill:false, tension:0.3, borderDash:[5,3] }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ' '+c.dataset.label+': '+fw(c.raw) } }
+    },
+    scales: {
+      y: { ticks: { callback: v => Math.round(v/10000).toLocaleString()+'만', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+      x: { ticks: { font: { size: 10 }, autoSkip: true, maxTicksLimit: 6 }, grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>

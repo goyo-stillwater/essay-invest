@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>부록 B — 세금 구조 | Stillwater</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --ink: #1C1C2E; --ink-soft: #4A4A6A; --ink-muted: #9090AA;
+  --paper: #F8F7F3; --paper-warm: #EFECE4;
+  --accent: #2D6A4F; --accent-light: #52B788; --accent-bg: #D8F3DC;
+  --red: #C1121F; --red-bg: #FFE5E7;
+  --gold: #A67C00; --gold-bg: #FFF8E1;
+  --purple: #5B3AB7; --purple-bg: #EDE9FF;
+  --border: #DDDAD0;
+  --font-serif: 'Georgia', serif;
+  --font-sans: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', monospace;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-sans); background: var(--paper); color: var(--ink); line-height: 1.7; font-size: 15px; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+
+.hero { background: var(--ink); color: var(--paper); padding: 52px 24px 44px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 160px; height: 160px; border-radius: 50%; background: var(--gold); opacity: 0.1; }
+.hero-series { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 14px; font-weight: 600; position: relative; z-index: 1; }
+.hero-title { font-family: var(--font-serif); font-size: 27px; line-height: 1.3; margin-bottom: 14px; font-weight: normal; position: relative; z-index: 1; }
+.hero-sub { font-size: 14px; color: rgba(248,247,243,0.6); line-height: 1.65; position: relative; z-index: 1; }
+
+.section { padding: 32px 20px; border-bottom: 1px solid var(--border); }
+.eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; margin-bottom: 8px; }
+.sec-title { font-family: var(--font-serif); font-size: 21px; line-height: 1.4; margin-bottom: 16px; color: var(--ink); font-weight: normal; }
+.body { font-size: 15px; color: var(--ink-soft); line-height: 1.78; margin-bottom: 14px; }
+.body strong { color: var(--ink); font-weight: 600; }
+.hl { background: var(--accent-bg); border-left: 3px solid var(--accent); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.warn { background: var(--red-bg); border-left: 3px solid var(--red); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.note { background: var(--gold-bg); border-left: 3px solid var(--gold); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+
+/* 핵심 사실 카드 */
+.key-fact { background: var(--ink); border-radius: 16px; padding: 24px 20px; color: var(--paper); margin: 16px 0; text-align: center; }
+.kf-label { font-size: 11px; color: rgba(248,247,243,0.4); letter-spacing: 0.08em; margin-bottom: 12px; }
+.kf-main  { font-family: var(--font-serif); font-size: 20px; line-height: 1.5; margin-bottom: 10px; }
+.kf-sub   { font-size: 13px; color: rgba(248,247,243,0.55); line-height: 1.7; }
+
+/* 시나리오 카드 */
+.scenario { border-radius: 14px; padding: 20px 18px; margin: 12px 0; }
+.scenario.a { background: var(--purple-bg); border: 1.5px solid rgba(91,58,183,0.2); }
+.scenario.b { background: var(--accent-bg); border: 1.5px solid rgba(45,106,79,0.2); }
+.scenario.c { background: var(--paper-warm); border: 1.5px solid var(--border); }
+.sc-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.sc-label.a { color: var(--purple); }
+.sc-label.b { color: var(--accent); }
+.sc-label.c { color: var(--ink-muted); }
+.sc-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 12px; line-height: 1.4; }
+.sc-calc  { background: rgba(0,0,0,0.04); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; color: var(--ink-soft); line-height: 1.9; }
+.sc-calc .row { display: flex; justify-content: space-between; }
+.sc-calc .row.total { border-top: 1px solid rgba(0,0,0,0.1); margin-top: 6px; padding-top: 6px; font-weight: 700; color: var(--ink); }
+.sc-note  { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
+
+/* 비교 표 */
+.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+.compare-table th { background: var(--paper-warm); padding: 9px 10px; text-align: left; font-size: 11px; font-weight: 700; color: var(--ink-muted); border-bottom: 1px solid var(--border); }
+.compare-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--ink-soft); vertical-align: top; }
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table .label { font-weight: 600; color: var(--ink); }
+.compare-table .highlight { font-family: var(--font-mono); font-weight: 700; color: var(--accent); }
+
+/* 다음 부록 */
+.next { background: var(--paper-warm); padding: 28px 20px; text-align: center; border-top: 1px solid var(--border); }
+.next-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 10px; }
+.next-q { font-family: var(--font-serif); font-size: 18px; line-height: 1.45; color: var(--ink); margin-bottom: 6px; }
+.next-hint { font-size: 13px; color: var(--ink-muted); }
+
+.term { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.term:last-child { border-bottom: none; }
+.term-word { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.term-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+.footer { padding: 24px 20px; text-align: center; font-size: 11px; color: var(--ink-muted); line-height: 1.7; border-top: 1px solid var(--border); }
+.prev-ch { display: block; text-align: center; padding: 14px; font-size: 13px; color: var(--ink-muted); border-bottom: 1px solid var(--border); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<a class="prev-ch" href="appendix_a.html">← 목차로 돌아가기</a>
+
+<div class="hero">
+  <div class="hero-series">Stillwater · 에세이 시리즈 · 부록 B</div>
+  <h1 class="hero-title">수익이 나면<br>세금이<br>어떻게 붙나요?</h1>
+  <p class="hero-sub">대부분 투자를 시작할 때 몰라요.<br>수익이 나고 나서야 알게 돼요.</p>
+</div>
+
+<!-- 섹션 1: 핵심 사실 -->
+<div class="section">
+  <div class="eyebrow">먼저 알아야 할 것</div>
+  <h2 class="sec-title">매도하지 않으면<br>세금이 없어요</h2>
+
+  <div class="key-fact">
+    <div class="kf-label">가장 중요한 사실</div>
+    <div class="kf-main">매수만 하고 매도하지 않으면<br>세금이 발생하지 않아요</div>
+    <div class="kf-sub">아무리 수익이 커도 팔기 전까지는 세금이 없어요.<br>이게 챕터 2에서 설명한 과세이연의 핵심이에요.<br>버티는 것이 세금 측면에서도 유리한 이유예요.</div>
+  </div>
+
+  <p class="body">매도했을 때 세금이 어떻게 붙는지 실제 시나리오로 보여드릴게요.</p>
+</div>
+
+<!-- 섹션 2: 시나리오 기준 -->
+<div class="section">
+  <div class="eyebrow">시나리오 조건</div>
+  <h2 class="sec-title">같은 조건에서<br>세 가지 경우를 비교해요</h2>
+
+  <div style="background:var(--paper-warm); border-radius:12px; padding:16px 14px; margin:16px 0; border:1.5px solid var(--border);">
+    <div style="font-size:14px; color:var(--ink-soft); line-height:1.9;">
+      투자 시작: <strong style="color:var(--ink);">2016년 1월 2일</strong><br>
+      투자 금액: <strong style="color:var(--ink);">1,000만원 (일시 투자)</strong><br>
+      매도 시점: <strong style="color:var(--ink);">2025년 12월 마지막 거래일</strong><br>
+      기준 지수: <strong style="color:var(--ink);">S&P 500 실제 수익률 적용</strong><br><br>
+      2025년 말 잔액: <strong style="color:var(--accent); font-family:var(--font-mono);">3,950만원</strong><br>
+      총 수익: <strong style="color:var(--accent); font-family:var(--font-mono);">2,950만원</strong>
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 3: 시나리오 A -->
+<div class="section">
+  <div class="eyebrow">시나리오 A</div>
+  <h2 class="sec-title">미국에 상장된 ETF를<br>직접 매수한 경우</h2>
+
+  <p class="body">해외 상장 ETF를 팔아서 수익이 나면 <strong>양도소득세</strong>가 붙어요. 연간 수익 250만원까지는 공제하고 초과분에 22%예요.</p>
+
+  <div class="scenario a">
+    <div class="sc-label a">시나리오 A · 해외 ETF 직접 매수</div>
+    <div class="sc-title">양도소득세 방식</div>
+    <div class="sc-calc">
+      <div class="row"><span>총 수익</span><span>2,950만원</span></div>
+      <div class="row"><span>기본공제</span><span>- 250만원</span></div>
+      <div class="row"><span>과세 대상</span><span>2,700만원</span></div>
+      <div class="row"><span>세율</span><span>22%</span></div>
+      <div class="row total"><span>납부 세금</span><span style="color:var(--red);">594만원</span></div>
+      <div class="row total"><span>세후 수령액</span><span style="color:var(--purple);">3,356만원</span></div>
+    </div>
+    <div class="sc-note">
+      ⚠️ 세금이 자동으로 처리되지 않아요.<br>
+      매년 5월에 직접 신고해야 해요.<br>
+      대부분의 증권사에서 신고 대행 서비스를 제공해요.
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 4: 시나리오 B -->
+<div class="section">
+  <div class="eyebrow">시나리오 B</div>
+  <h2 class="sec-title">국내에 상장된 해외 ETF를<br>원화로 매수한 경우</h2>
+
+  <p class="body">국내 상장 해외 ETF의 매매차익에는 <strong>배당소득세 15.4%</strong>가 붙어요.</p>
+
+  <p class="body">여기서 배당소득세라는 말이 헷갈릴 수 있어요. 배당금에 붙는 세금과 이름이 같거든요. 국내 상장 해외 ETF는 주식을 팔아서 번 매매차익도 세금 분류상 배당소득으로 취급해요. 배당금을 받은 게 아니라 팔아서 번 돈인데 배당소득세라는 이름이 붙는 거예요.</p>
+
+  <div class="scenario b">
+    <div class="sc-label b">시나리오 B · 국내 상장 해외 ETF</div>
+    <div class="sc-title">배당소득세 방식</div>
+    <div class="sc-calc">
+      <div class="row"><span>총 수익</span><span>2,950만원</span></div>
+      <div class="row"><span>기본공제</span><span>없음</span></div>
+      <div class="row"><span>과세 대상</span><span>2,950만원 전액</span></div>
+      <div class="row"><span>세율</span><span>15.4%</span></div>
+      <div class="row total"><span>납부 세금</span><span style="color:var(--red);">454만원</span></div>
+      <div class="row total"><span>세후 수령액</span><span style="color:var(--accent);">3,496만원</span></div>
+    </div>
+    <div class="sc-note">
+      ✅ 별도 신고 없이 자동으로 원천징수돼요.
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 5: 시나리오 C -->
+<div class="section">
+  <div class="eyebrow">시나리오 C</div>
+  <h2 class="sec-title">매도하지 않으면</h2>
+
+  <div class="scenario c">
+    <div class="sc-label c">시나리오 C · 계속 보유</div>
+    <div class="sc-title">과세이연 방식</div>
+    <div class="sc-calc">
+      <div class="row"><span>계좌 잔액</span><span style="color:var(--accent); font-weight:700;">3,950만원</span></div>
+      <div class="row"><span>납부 세금</span><span>0원</span></div>
+      <div class="row total"><span>실제 내 돈</span><span style="color:var(--accent);">3,950만원</span></div>
+    </div>
+    <div class="sc-note">
+      단, 팔기 전까지예요. 팔 때 세금이 발생해요.<br>
+      버티는 것이 수익률뿐 아니라 세금 측면에서도 유리해요.
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 6: 세 가지 비교 -->
+<div class="section">
+  <div class="eyebrow">한눈에 비교</div>
+  <h2 class="sec-title">세 가지를<br>나란히 보면</h2>
+
+  <table class="compare-table">
+    <thead>
+      <tr><th></th><th>해외 ETF</th><th>국내 ETF</th><th>미매도</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label">세금</td>
+        <td style="color:var(--red); font-family:var(--font-mono); font-weight:600;">594만원</td>
+        <td style="color:var(--gold); font-family:var(--font-mono); font-weight:600;">454만원</td>
+        <td style="color:var(--accent); font-family:var(--font-mono); font-weight:600;">0원</td>
+      </tr>
+      <tr>
+        <td class="label">수령액</td>
+        <td class="highlight" style="color:var(--purple);">3,356만원</td>
+        <td class="highlight">3,496만원</td>
+        <td class="highlight" style="color:var(--accent);">3,950만원*</td>
+      </tr>
+      <tr>
+        <td class="label">신고</td>
+        <td>매년 5월<br>직접 신고</td>
+        <td>자동<br>원천징수</td>
+        <td>해당 없음</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="body" style="font-size:12px; color:var(--ink-muted);">* 미매도 시 3,950만원은 팔 때까지 과세이연 상태예요. 팔 때 세금이 발생해요.</p>
+
+  <div class="hl">
+    세금만 보면 국내 상장 ETF가 약 140만원 유리해요.<br><br>
+    하지만 상품 선택의 폭, 환율 구조, 신고 편의성이 달라요. 세금 하나만 보고 결정하지 않아도 돼요.
+  </div>
+</div>
+
+<!-- 섹션 7: 법적 고지 -->
+<div class="section">
+  <div class="eyebrow">중요 안내</div>
+  <div class="warn">
+    세금 관련 내용은 법령 개정에 따라 변경될 수 있어요.<br><br>
+    이 부록의 내용은 2025년 말 기준이에요. 정확한 내용은 국세청 홈택스 또는 담당 세무사에게 확인하세요.
+  </div>
+</div>
+
+<!-- 다음 부록 -->
+<div class="next">
+  <div class="next-label">다음 · 부록 C<a href="appendix_c.html" style="display:inline-block;margin-top:20px;background:#52B788;color:#F8F7F3;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;">다음으로 →</a></div>
+  <div class="next-q">"S&P 500과 나스닥 100,<br>어느 쪽이 나에게 맞나요?"</div>
+  <div class="next-hint" style="margin-top:6px;">데이터로 직접 비교해봐요</div>
+</div>
+
+<!-- 용어 정리 -->
+<div class="section">
+  <div class="eyebrow">용어 정리</div>
+  <div class="term">
+    <div class="term-word">양도소득세</div>
+    <div class="term-desc">자산을 팔아서 생긴 수익(양도차익)에 붙는 세금이에요. 해외 상장 ETF는 연간 수익 250만원까지 공제 후 초과분에 22%가 붙어요. 매년 5월에 직접 신고해야 해요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">배당소득세</div>
+    <div class="term-desc">배당금에 붙는 세금이에요. 국내 상장 해외 ETF의 경우 매매차익도 세금 분류상 배당소득으로 취급해서 15.4%가 자동으로 원천징수돼요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">원천징수</div>
+    <div class="term-desc">세금을 내는 사람이 직접 신고하지 않아도 지급하는 쪽에서 먼저 세금을 떼고 지급하는 방식이에요. 국내 상장 ETF 매매차익은 자동으로 원천징수돼요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">과세이연</div>
+    <div class="term-desc">세금 납부를 나중으로 미루는 구조예요. 팔기 전까지는 수익에 세금이 붙지 않아요. 그 덕분에 세금이 이연된 금액도 계속 복리로 굴러요.</div>
+  </div>
+</div>
+
+
+<div style="padding:20px;text-align:center;border-top:1px solid #DDDAD0;background:#F8F7F3;">
+  <a href="index.html" style="display:inline-block;padding:12px 24px;background:#1C1C2E;color:#F8F7F3;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;">☰ 목차로</a>
+</div>
+<div class="footer">
+  © Stillwater Investment Essays<br>
+  본 콘텐츠의 무단 복제 및 배포를 금합니다.<br>
+  <span style="display:block; margin-top:4px;">투자 결과의 책임은 본인에게 있습니다.</span>
+</div>
+
+</body>
+</html>

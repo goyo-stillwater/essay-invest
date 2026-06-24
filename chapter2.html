@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>챕터 2 — 은행 이자와 뭐가 다른가요? | Stillwater</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --ink: #1C1C2E; --ink-soft: #4A4A6A; --ink-muted: #9090AA;
+  --paper: #F8F7F3; --paper-warm: #EFECE4;
+  --accent: #2D6A4F; --accent-light: #52B788; --accent-bg: #D8F3DC;
+  --red: #C1121F; --red-bg: #FFE5E7;
+  --gold: #A67C00; --gold-bg: #FFF8E1;
+  --orange: #E07000; --orange-bg: #FFF3E0;
+  --border: #DDDAD0;
+  --font-serif: 'Georgia', serif;
+  --font-sans: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', monospace;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-sans); background: var(--paper); color: var(--ink); line-height: 1.7; font-size: 15px; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
+
+.hero { background: var(--ink); color: var(--paper); padding: 52px 24px 44px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; top: -40px; right: -40px; width: 160px; height: 160px; border-radius: 50%; background: var(--orange); opacity: 0.1; }
+.hero-series { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 14px; font-weight: 600; position: relative; z-index: 1; }
+.hero-title { font-family: var(--font-serif); font-size: 27px; line-height: 1.3; margin-bottom: 14px; font-weight: normal; position: relative; z-index: 1; }
+.hero-sub { font-size: 14px; color: rgba(248,247,243,0.6); line-height: 1.65; position: relative; z-index: 1; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; background: rgba(82,183,136,0.15); border: 1px solid rgba(82,183,136,0.3); border-radius: 20px; padding: 5px 12px; font-size: 11px; color: var(--accent-light); position: relative; z-index: 1; }
+
+.section { padding: 32px 20px; border-bottom: 1px solid var(--border); }
+.eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; margin-bottom: 8px; }
+.sec-title { font-family: var(--font-serif); font-size: 21px; line-height: 1.4; margin-bottom: 16px; color: var(--ink); font-weight: normal; }
+.body { font-size: 15px; color: var(--ink-soft); line-height: 1.78; margin-bottom: 14px; }
+.body strong { color: var(--ink); font-weight: 600; }
+.hl { background: var(--accent-bg); border-left: 3px solid var(--accent); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.warn { background: var(--red-bg); border-left: 3px solid var(--red); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+.note { background: var(--gold-bg); border-left: 3px solid var(--gold); padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px; line-height: 1.65; color: var(--ink); }
+
+/* 비교 결과 카드 */
+.result-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+.rc-box { border-radius: 12px; padding: 16px 14px; text-align: center; }
+.rc-box.spy  { background: var(--accent-bg); border: 1.5px solid rgba(45,106,79,0.2); }
+.rc-box.dep  { background: var(--orange-bg); border: 1.5px solid rgba(224,112,0,0.2); }
+.rc-label { font-size: 11px; font-weight: 700; color: var(--ink-muted); margin-bottom: 8px; line-height: 1.4; }
+.rc-val   { font-family: var(--font-mono); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.rc-pct   { font-size: 12px; font-weight: 600; }
+
+/* 세금 구조 카드 */
+.tax-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+.tc-item { border-radius: 12px; padding: 16px 14px; }
+.tc-item.bad  { background: var(--orange-bg); border: 1.5px solid rgba(224,112,0,0.2); }
+.tc-item.good { background: var(--accent-bg); border: 1.5px solid rgba(45,106,79,0.2); }
+.tc-title { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+.tc-title.bad  { color: var(--orange); }
+.tc-title.good { color: var(--accent); }
+.tc-desc { font-size: 12px; color: var(--ink-soft); line-height: 1.7; }
+
+/* 슬라이더 다크카드 */
+.dark-card { background: var(--ink); border-radius: 16px; padding: 22px 18px; margin: 18px 0; color: var(--paper); }
+.dark-card-title { font-size: 12px; color: rgba(248,247,243,0.5); margin-bottom: 16px; }
+.slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.slider-label { font-size: 12px; color: rgba(248,247,243,0.65); min-width: 48px; }
+.sw-slider { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: rgba(248,247,243,0.18); outline: none; }
+.sw-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-light); cursor: pointer; }
+.slider-val { font-family: var(--font-mono); font-size: 13px; color: var(--accent-light); min-width: 72px; text-align: right; }
+.result-big { text-align: center; padding: 18px 0; border-top: 1px solid rgba(248,247,243,0.1); border-bottom: 1px solid rgba(248,247,243,0.1); margin: 14px 0; }
+.result-label { font-size: 11px; color: rgba(248,247,243,0.4); margin-bottom: 6px; }
+.result-val { font-family: var(--font-mono); font-size: 28px; font-weight: 700; line-height: 1.1; }
+.result-pct { font-size: 13px; margin-top: 4px; }
+.result-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rs { background: rgba(248,247,243,0.06); border-radius: 10px; padding: 12px; text-align: center; }
+.rs-label { font-size: 10px; color: rgba(248,247,243,0.4); margin-bottom: 4px; line-height: 1.4; }
+.rs-val { font-family: var(--font-mono); font-size: 16px; font-weight: 600; }
+
+/* 차트 */
+.legend-row { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-soft); }
+.legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.chart-wrap  { position: relative; height: 220px; margin: 8px 0 6px; }
+.chart-note  { font-size: 11px; color: var(--ink-muted); text-align: center; }
+
+/* 연도 버튼 */
+.yr-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; margin: 8px 0 10px; }
+.yr-btn { background: var(--paper-warm); border: 1px solid var(--border); border-radius: 7px; padding: 7px 4px; text-align: center; cursor: pointer; transition: all 0.15s; user-select: none; }
+.yr-btn:active { transform: scale(0.96); }
+.yr-btn.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.yr-btn-y    { font-size: 12px; font-weight: 600; display: block; margin-bottom: 1px; }
+.yr-btn-hint { font-size: 10px; color: var(--ink-muted); }
+.yr-btn.active .yr-btn-hint { color: rgba(248,247,243,0.4); }
+.yr-detail { background: var(--ink); border-radius: 12px; padding: 16px; color: var(--paper); }
+.yd-hint { font-size: 13px; color: rgba(248,247,243,0.3); text-align: center; padding: 8px 0; }
+.yd-year { font-size: 11px; color: rgba(248,247,243,0.45); margin-bottom: 10px; }
+.yd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.yd-item { background: rgba(248,247,243,0.07); border-radius: 8px; padding: 10px 8px; text-align: center; }
+.yd-ticker { font-size: 10px; color: rgba(248,247,243,0.45); margin-bottom: 4px; font-weight: 600; }
+.yd-rate   { font-family: var(--font-mono); font-size: 16px; font-weight: 700; }
+.yd-bal    { font-size: 10px; color: rgba(248,247,243,0.4); margin-top: 3px; }
+
+/* 과세이연 효과 */
+.tax-effect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+.te-item { border-radius: 10px; padding: 14px 12px; text-align: center; }
+.te-item.a { background: var(--orange-bg); border: 1.5px solid rgba(224,112,0,0.2); }
+.te-item.b { background: var(--accent-bg); border: 1.5px solid rgba(45,106,79,0.2); }
+.te-label { font-size: 11px; color: var(--ink-muted); margin-bottom: 6px; line-height: 1.4; font-weight: 600; }
+.te-val   { font-family: var(--font-mono); font-size: 20px; font-weight: 700; margin-bottom: 3px; }
+.te-sub   { font-size: 11px; color: var(--ink-muted); }
+
+/* 다음 챕터 */
+.next { background: var(--ink); color: var(--paper); padding: 36px 20px; text-align: center; }
+.next-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248,247,243,0.35); margin-bottom: 12px; }
+.next-q { font-family: var(--font-serif); font-size: 19px; line-height: 1.45; margin-bottom: 8px; }
+.next-hint { font-size: 13px; color: rgba(248,247,243,0.4); }
+
+.term { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.term:last-child { border-bottom: none; }
+.term-word { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.term-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+.footer { padding: 24px 20px; text-align: center; font-size: 11px; color: var(--ink-muted); line-height: 1.7; border-top: 1px solid var(--border); }
+.prev-ch { display: block; text-align: center; padding: 14px; font-size: 13px; color: var(--ink-muted); border-bottom: 1px solid var(--border); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<a class="prev-ch" href="chapter1.html">← 목차로 돌아가기</a>
+
+<div class="hero">
+  <div class="hero-series">Stillwater · 에세이 시리즈 · 챕터 2</div>
+  <h1 class="hero-title">은행 이자와<br>뭐가<br>다른가요?</h1>
+  <p class="hero-sub">둘 다 복리인데 왜 결과가<br>이렇게 다를까요?</p>
+  <div class="hero-badge">📊 실제 데이터 기반 · 2016~2025</div>
+</div>
+
+<!-- 섹션 1: 왜 차이가 났을까 -->
+<div class="section">
+  <div class="eyebrow">출발점</div>
+  <h2 class="sec-title">챕터 1에서 본 결과,<br>왜 이런 차이가 났을까요?</h2>
+
+  <p class="body">챕터 1에서 봤어요. 1,000만원을 S&P 500 인덱스 펀드에 넣고 10년간 들고만 있었더니 3,920만원이 됐어요.</p>
+  <p class="body">같은 1,000만원을 같은 기간 정기예금에 넣었다면 약 1,184만원이었어요.</p>
+
+  <div class="result-compare">
+    <div class="rc-box spy">
+      <div class="rc-label">S&P 500<br>인덱스 펀드</div>
+      <div class="rc-val" style="color:var(--accent);">3,920만원</div>
+      <div class="rc-pct" style="color:var(--accent);">+292%</div>
+    </div>
+    <div class="rc-box dep">
+      <div class="rc-label">정기예금<br>복리 재예치</div>
+      <div class="rc-val" style="color:var(--orange);">1,184만원</div>
+      <div class="rc-pct" style="color:var(--orange);">+18%</div>
+    </div>
+  </div>
+
+  <p class="body">같은 복리인데 왜 이렇게 차이가 났을까요. 이유는 두 가지예요.</p>
+</div>
+
+<!-- 섹션 2: 차이 1 수익률 -->
+<div class="section">
+  <div class="eyebrow">차이 1</div>
+  <h2 class="sec-title">수익률 자체가<br>달라요</h2>
+
+  <p class="body">아래 차트는 2016~2025년 S&P 500 인덱스 수익률과 한국 정기예금 금리를 나란히 보여줘요. 연도 버튼을 터치해보세요.</p>
+
+  <div class="legend-row">
+    <div class="legend-item"><div class="legend-dot" style="background:#52B788;"></div>S&P 500 인덱스 수익률</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E07000;"></div>정기예금 금리 (세전)</div>
+  </div>
+
+  <div class="chart-wrap">
+    <canvas id="rateChart" role="img" aria-label="S&P 500 수익률 vs 정기예금 금리 비교 바 차트"></canvas>
+  </div>
+  <div class="chart-note">S&P 500: 배당 재투자 포함 · 정기예금: 한국은행 통계 기준</div>
+
+  <div class="yr-grid" id="yrGrid"></div>
+  <div class="yr-detail" id="yrDetail"><div class="yd-hint">연도 버튼을 터치해보세요</div></div>
+
+  <div class="hl" style="margin-top:16px;">
+    2016~2025년 연평균 수익률을 비교하면 이렇게 달라요.<br><br>
+    S&P 500 인덱스: 연평균 약 <strong>14.7%</strong><br>
+    정기예금 금리: 연평균 약 <strong>2.1%</strong><br><br>
+    수익률 자체가 7배 가까이 달라요. 그런데 이것만으로 격차를 다 설명하지 못해요. 두 번째 이유가 더 있어요.
+  </div>
+</div>
+
+<!-- 섹션 3: 차이 2 과세이연 -->
+<div class="section">
+  <div class="eyebrow">차이 2</div>
+  <h2 class="sec-title">세금이 붙는<br>시점이 달라요</h2>
+
+  <p class="body">정기예금 이자는 받을 때마다 15.4%가 자동으로 빠져요. 매년이요.</p>
+  <p class="body">주식 인덱스 펀드는 달라요. 팔 때까지 세금이 없어요. 들고 있는 동안은 아무리 불어나도 세금이 없어요.</p>
+  <p class="body">이걸 <strong>과세이연</strong>이라고 해요. 세금 납부를 나중으로 미루는 거예요.</p>
+
+  <div class="tax-compare">
+    <div class="tc-item bad">
+      <div class="tc-title bad">🏦 정기예금</div>
+      <div class="tc-desc">
+        매년 이자 수령 시<br>15.4% 자동 차감<br><br>
+        세금만큼 원금이 줄어요.<br>줄어든 원금으로 다음 해 복리가 붙어요.
+      </div>
+    </div>
+    <div class="tc-item good">
+      <div class="tc-title good">📈 인덱스 펀드</div>
+      <div class="tc-desc">
+        보유 중 세금 없음<br>매도할 때 한 번만<br><br>
+        세금이 이연된 만큼<br>원금에 포함되어 계속 굴러요.
+      </div>
+    </div>
+  </div>
+
+  <p class="body">왜 이게 중요할까요. 매년 세금이 빠지면 그 세금만큼 복리 원금이 줄어요. 시간이 길수록 그 차이가 쌓여요.</p>
+
+  <div class="tax-effect-grid">
+    <div class="te-item a">
+      <div class="te-label">매년 세금 차감<br>(정기예금 방식)</div>
+      <div class="te-val" style="color:var(--orange);">1,184만원</div>
+      <div class="te-sub">10년 후</div>
+    </div>
+    <div class="te-item b">
+      <div class="te-label">과세이연 후 마지막<br>한 번만 차감 (주식 방식)</div>
+      <div class="te-val" style="color:var(--accent);">3,920만원</div>
+      <div class="te-sub">10년 후 (수익률 차이 포함)</div>
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 4: 슬라이더 -->
+<div class="section">
+  <div class="eyebrow">직접 계산해보기</div>
+  <h2 class="sec-title">내 금액으로<br>비교해볼까요?</h2>
+
+  <p class="body">슬라이더로 금액을 바꾸면 S&P 500과 정기예금 결과가 실시간으로 바뀌어요.</p>
+
+  <div class="dark-card">
+    <div class="dark-card-title">💰 2016년 1월 투자금액 설정</div>
+    <div class="slider-row">
+      <span class="slider-label">투자금</span>
+      <input type="range" class="sw-slider" id="amtSlider" min="100" max="10000" value="1000" step="100">
+      <span class="slider-val" id="amtVal">1,000만원</span>
+    </div>
+    <div class="result-big">
+      <div class="result-label">2025년 말 · S&P 500 인덱스 펀드 결과</div>
+      <div class="result-val" style="color:var(--accent-light);" id="spyResult">3,920만원</div>
+      <div class="result-pct" style="color:rgba(82,183,136,0.7);" id="spyPct">+292%</div>
+    </div>
+    <div class="result-sub-grid">
+      <div class="rs">
+        <div class="rs-label">정기예금<br>복리 재예치 (세후)</div>
+        <div class="rs-val" style="color:#F4A261;" id="depResult">1,184만원</div>
+      </div>
+      <div class="rs">
+        <div class="rs-label">인덱스 펀드가<br>예금보다 더 번 금액</div>
+        <div class="rs-val" style="color:var(--accent-light);" id="diffResult">+2,736만원</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 섹션 5: 정기예금의 역할 -->
+<div class="section">
+  <div class="eyebrow">오해하지 마세요</div>
+  <h2 class="sec-title">그렇다면 정기예금은<br>의미가 없는 건가요?</h2>
+
+  <p class="body">아니에요. 정기예금이 나쁜 상품이 아니에요. <strong>목적이 달라요.</strong></p>
+
+  <p class="body">정기예금은 원금이 절대 줄지 않아요. 언제 써야 할지 정해진 돈, 잃으면 안 되는 돈을 위한 도구예요.</p>
+
+  <p class="body">주식 인덱스 펀드는 당장 쓸 일이 없는 돈, 충분히 긴 시간 동안 맡길 수 있는 돈을 위한 도구예요.</p>
+
+  <div class="hl">
+    두 가지는 경쟁 관계가 아니에요. <strong>역할이 다른 도구예요.</strong><br><br>
+    용도에 맞게 나눠 쓰는 게 맞아요.
+  </div>
+
+  <div class="note">
+    <strong>* 과세이연 계좌 활용</strong><br><br>
+    한국에는 과세이연 혜택을 주는 계좌가 있어요. ISA 계좌나 연금저축 계좌예요. 계좌 안에서는 수익이 나도 바로 세금이 붙지 않아요. 이 계좌를 활용하면 과세이연 효과를 더 오래 유지할 수 있어요. 구체적인 내용은 부록에서 다룰게요.
+  </div>
+</div>
+
+<!-- 다음 챕터 -->
+<div class="next">
+  <div class="next-label">다음 · 챕터 3<a href="chapter3.html" style="display:inline-block;margin-top:20px;background:#52B788;color:#F8F7F3;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:600;text-decoration:none;">다음으로 →</a></div>
+  <div class="next-q">"그냥 좋은 주식을<br>직접 고르면 더 낫지 않나요?"</div>
+  <div class="next-hint" style="margin-top:8px;">2015년 말 상위 10개 기업으로 직접 확인해봐요</div>
+</div>
+
+<!-- 용어 정리 -->
+<div class="section">
+  <div class="eyebrow">용어 정리</div>
+  <div class="term">
+    <div class="term-word">과세이연</div>
+    <div class="term-desc">세금 납부를 나중으로 미루는 구조예요. 주식을 팔기 전까지는 수익에 세금이 붙지 않아요. 그 덕분에 세금이 이연된 금액도 원금에 포함되어 계속 복리로 굴러요. 같은 수익률이라도 과세이연이 되면 장기적으로 더 큰 결과를 만들어요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">이자소득세</div>
+    <div class="term-desc">은행 이자에 붙는 세금이에요. 한국 기준 15.4%(소득세 14% + 지방소득세 1.4%)가 자동으로 차감돼요. 정기예금은 이자를 받을 때마다 이 세금이 빠지기 때문에 복리 원금이 매년 줄어드는 효과가 생겨요.</div>
+  </div>
+  <div class="term">
+    <div class="term-word">ISA · 연금저축 계좌</div>
+    <div class="term-desc">한국에서 과세이연 혜택을 받을 수 있는 대표적인 절세 계좌예요. 계좌 안에서 발생하는 수익에 대해 즉시 과세하지 않아요. 구체적인 활용 방법은 부록에서 다룰게요.</div>
+  </div>
+</div>
+
+
+<div style="padding:20px;text-align:center;border-top:1px solid #DDDAD0;background:#F8F7F3;">
+  <a href="index.html" style="display:inline-block;padding:12px 24px;background:#1C1C2E;color:#F8F7F3;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;">☰ 목차로</a>
+</div>
+<div class="footer">
+  © Stillwater Investment Essays<br>
+  본 콘텐츠의 무단 복제 및 배포를 금합니다.<br>
+  <span style="display:block; margin-top:4px;">투자 결과의 책임은 본인에게 있습니다.</span>
+</div>
+
+<script>
+const SPY_R = [12.00, 21.70, -4.56, 31.22, 18.37, 28.75, -18.17, 26.19, 24.89, 17.72];
+const DEP_R = [1.58, 1.65, 1.93, 1.79, 1.00, 1.20, 2.90, 3.60, 3.20, 2.90];
+const TAX   = 0.154;
+const YRS   = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const BASE  = 10000000;
+
+// 잔액 계산
+function calcBal(rates, init, taxRate){
+  let arr=[init], v=init;
+  rates.forEach(r=>{ v=v*(1+r/100*(1-(taxRate||0))); arr.push(Math.round(v)); });
+  return arr;
+}
+const spyBal = calcBal(SPY_R, BASE);
+const depBal = calcBal(DEP_R, BASE, TAX);
+
+function fw(v){ return Math.round(v/10000).toLocaleString()+'만원'; }
+function fp(v,b){ const p=((v-b)/b*100).toFixed(1); return (v>=b?'+':'')+p+'%'; }
+
+// ── 수익률 비교 바 차트 ──
+const ctx = document.getElementById('rateChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: YRS.map(String),
+    datasets: [
+      {
+        label: 'S&P 500',
+        data: SPY_R,
+        backgroundColor: SPY_R.map(r => r>=0 ? 'rgba(82,183,136,0.8)' : 'rgba(193,18,31,0.8)'),
+        borderRadius: 4,
+      },
+      {
+        label: '정기예금',
+        data: DEP_R,
+        backgroundColor: 'rgba(224,112,0,0.6)',
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ' '+c.dataset.label+': '+(c.raw>0?'+':'')+c.raw.toFixed(2)+'%' } }
+    },
+    scales: {
+      y: { ticks: { callback: v => v+'%', font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+      x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+    }
+  }
+});
+
+// ── 연도 버튼 ──
+const yrGrid   = document.getElementById('yrGrid');
+const yrDetail = document.getElementById('yrDetail');
+let activeYr = -1;
+
+YRS.forEach((yr, i) => {
+  const btn = document.createElement('div');
+  btn.className = 'yr-btn';
+  btn.innerHTML = `<span class="yr-btn-y">${yr}</span><span class="yr-btn-hint">터치</span>`;
+  btn.addEventListener('click', () => {
+    if(activeYr === i){
+      yrDetail.innerHTML = '<div class="yd-hint">연도 버튼을 터치해보세요</div>';
+      btn.classList.remove('active'); activeYr = -1; return;
+    }
+    document.querySelectorAll('.yr-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); activeYr = i;
+    const spyRate = SPY_R[i];
+    const depRate = DEP_R[i];
+    yrDetail.innerHTML = `
+      <div class="yd-year">${yr}년 수익률 비교</div>
+      <div class="yd-grid">
+        <div class="yd-item">
+          <div class="yd-ticker">S&P 500</div>
+          <div class="yd-rate" style="color:${spyRate>=0?'#52B788':'#FF8A8A'};">${spyRate>0?'+':''}${spyRate.toFixed(2)}%</div>
+          <div class="yd-bal">${fw(spyBal[i+1])}</div>
+        </div>
+        <div class="yd-item">
+          <div class="yd-ticker">정기예금</div>
+          <div class="yd-rate" style="color:#F4A261;">+${depRate.toFixed(2)}%</div>
+          <div class="yd-bal">${fw(depBal[i+1])}</div>
+        </div>
+      </div>
+    `;
+  });
+  yrGrid.appendChild(btn);
+});
+
+// ── 슬라이더 ──
+const amtSlider = document.getElementById('amtSlider');
+function updateCalc(){
+  const amt = parseInt(amtSlider.value) * 10000;
+  document.getElementById('amtVal').textContent = (amt/10000).toLocaleString()+'만원';
+  let spy = amt, dep = amt;
+  SPY_R.forEach(r => { spy = spy*(1+r/100); });
+  DEP_R.forEach(r => { dep = dep*(1+r/100*(1-TAX)); });
+  spy = Math.round(spy); dep = Math.round(dep);
+  document.getElementById('spyResult').textContent  = fw(spy);
+  document.getElementById('spyPct').textContent     = fp(spy, amt);
+  document.getElementById('depResult').textContent  = fw(dep);
+  document.getElementById('diffResult').textContent = '+'+fw(spy-dep);
+}
+amtSlider.addEventListener('input', updateCalc);
+updateCalc();
+</script>
+</body>
+</html>
