@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>20년이 만든 18억원 — Stillwater</title>
+
+<style>
+/* ===========================================================
+   Stillwater 투자 에세이 2 — 공용 스타일시트
+   에세이 1과 동일한 디자인 시스템을 그대로 따릅니다.
+   =========================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --ink: #1C1C2E;
+  --ink-soft: #4A4A6A;
+  --ink-muted: #9090AA;
+  --paper: #F8F7F3;
+  --paper-warm: #EFECE4;
+  --accent: #2D6A4F;
+  --accent-light: #52B788;
+  --accent-bg: #D8F3DC;
+  --red: #C1121F;
+  --red-bg: #FFE5E7;
+  --gold: #A67C00;
+  --gold-bg: #FFF3CD;
+  --border: #DDDAD0;
+  --font-serif: 'Georgia', serif;
+  --font-sans: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', monospace;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.7;
+  font-size: 15px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+/* HERO */
+.hero { background: var(--ink); color: var(--paper); padding: 52px 24px 44px; position: relative; overflow: hidden; }
+.hero::after { content: ''; position: absolute; bottom: -40px; right: -40px; width: 160px; height: 160px; border-radius: 50%; background: var(--accent); opacity: 0.12; }
+.hero-series { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 14px; font-weight: 600; position: relative; z-index: 1; }
+.hero-title { font-family: var(--font-serif); font-size: 27px; line-height: 1.35; margin-bottom: 14px; font-weight: normal; position: relative; z-index: 1; }
+.hero-sub { font-size: 14px; color: rgba(248,247,243,0.6); line-height: 1.65; position: relative; z-index: 1; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 18px;
+  background: rgba(82,183,136,0.15); border: 1px solid rgba(82,183,136,0.3);
+  border-radius: 20px; padding: 5px 12px; font-size: 11px; color: var(--accent-light);
+  position: relative; z-index: 1;
+}
+
+/* SECTION */
+.section { padding: 32px 20px; border-bottom: 1px solid var(--border); }
+.eyebrow { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; margin-bottom: 8px; }
+.sec-title { font-family: var(--font-serif); font-size: 21px; line-height: 1.4; margin-bottom: 16px; color: var(--ink); font-weight: normal; }
+.body { font-size: 15px; color: var(--ink-soft); line-height: 1.78; margin-bottom: 14px; }
+.body strong { color: var(--ink); font-weight: 600; }
+.hl {
+  background: var(--accent-bg); border-left: 3px solid var(--accent);
+  padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0;
+  font-size: 14px; line-height: 1.65; color: var(--ink);
+}
+.warn {
+  background: var(--red-bg); border-left: 3px solid var(--red);
+  padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0;
+  font-size: 14px; line-height: 1.65; color: var(--ink);
+}
+.note {
+  background: var(--gold-bg); border-left: 3px solid var(--gold);
+  padding: 13px 15px; border-radius: 0 8px 8px 0; margin: 16px 0;
+  font-size: 14px; line-height: 1.65; color: var(--ink);
+}
+
+/* 다크 카드 (위젯 컨테이너) */
+.dark-card { background: var(--ink); border-radius: 16px; padding: 22px 18px; margin: 18px 0; color: var(--paper); }
+.dark-card-title { font-size: 12px; color: rgba(248,247,243,0.5); margin-bottom: 16px; }
+
+/* 다음 챕터 티저 */
+.next { background: var(--ink); color: var(--paper); padding: 36px 20px; text-align: center; }
+.next-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(248,247,243,0.35); margin-bottom: 12px; }
+.next-q { font-family: var(--font-serif); font-size: 19px; line-height: 1.45; margin-bottom: 8px; }
+.next-hint { font-size: 13px; color: rgba(248,247,243,0.4); margin-top: 8px; }
+.next-btn { display: inline-block; margin-top: 20px; background: var(--accent-light); color: #F8F7F3; padding: 14px 28px; border-radius: 12px; font-size: 14px; font-weight: 600; text-decoration: none; }
+
+/* 출처(각주) */
+.sources { padding: 14px 0 0; }
+.src-item { font-size: 11.5px; color: var(--ink-muted); line-height: 1.7; margin-bottom: 8px; padding-left: 18px; position: relative; }
+.src-item .src-num { position: absolute; left: 0; font-family: var(--font-mono); color: var(--ink-muted); }
+
+/* 목차로 버튼 + 푸터 */
+.backhome-wrap { padding: 20px; text-align: center; border-top: 1px solid var(--border); background: var(--paper); }
+.backhome-btn { display: inline-block; padding: 12px 24px; background: var(--ink); color: var(--paper); border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; }
+.footer { padding: 24px 20px; text-align: center; font-size: 11px; color: var(--ink-muted); line-height: 1.7; border-top: 1px solid var(--border); }
+
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-series">Stillwater · 에세이 시리즈 · 프롤로그</div>
+  <h1 class="hero-title">20년이 만든<br>18억원</h1>
+  <p class="hero-sub">그런데 그 20년이,<br>이제는 없습니다</p>
+</div>
+
+<div class="section">
+  <div class="eyebrow">에세이 1에서 이어서</div>
+  <h2 class="sec-title">20년이 만든<br>18억원</h2>
+
+  <p class="body">"아무도 제대로 말해주지 않은 인덱스 펀드 이야기"에서 다룬 핵심은, 복리의 마법이 벌어지려면 시간이 필요하다는 것이었습니다.</p>
+
+  <div class="hl">2005년 말에 나스닥100에 1억원을 넣어두고 20년을 그대로 뒀다면, 2025년 말 기준 약 18억원이 되어 있었을 겁니다.</div>
+
+  <p class="body">문제는 지금 50대 초반에 들어선 입장에서, 그 20년을 다시 확보하기는 쉽지 않다는 것입니다.</p>
+
+  <p class="body">우리가 투자를 하는 이유는 결국 불로소득 때문입니다. 노동을 들이지 않고도 돈이 벌리는 구조를 원해서죠.</p>
+
+  <p class="body">그런데 시간이 부족하다고 느끼자, 오히려 반대 방향으로 움직였습니다. 좋은 종목을 직접 고르는 일이 얼마나 어려운지는 이미 알고 있었지만, 그래도 퇴근 후 따로 시간을 들여 개별 종목을 공부하기 시작했습니다. 기업의 가치를 평가하고, 어떤 기업에 언제 들어가서 언제 나와야 하는지를 따져보는 일이었습니다.</p>
+
+  <p class="body">불로소득을 만들고 싶어서 시작한 일이었는데, 정작 그 불로소득을 위해 이만큼의 노동을 들여야 한다면 본업을 하나 더 가진 것과 다르지 않았습니다. 그리고 본업이 두 개라는 건, 아끼는 사람들과 보내고 싶은 시간, 정말 하고 싶었던 일들을 그만큼 내려놓아야 한다는 뜻이었습니다.</p>
+
+  <p class="body">그러다 문득 이런 생각이 들었습니다. 인덱스 펀드에도 2배, 3배로 추종하는 상품이 있다는 걸, 혹시 알고 계셨나요?</p>
+</div>
+
+<div class="section">
+  <div class="eyebrow">있습니다</div>
+  <h2 class="sec-title">15년 전에 이미<br>출시된 상품</h2>
+
+  <p class="body">나스닥100과 S&P500을 각각 2배로 추종하는 상품은 2006년에, 3배로 추종하는 상품은 2009~2010년에 상장됐습니다. 이미 15년 넘게 시장에서 거래돼온 상품이라는 뜻입니다.</p>
+
+  <p class="body">그런데 이 상품은 전문가들 사이에서 장기 투자로는 위험하다는 말을 자주 듣습니다. 그래서 처음부터 고려 대상에서 지워버리는 경우가 많습니다.</p>
+
+  <p class="body">무작정 뛰어들자는 게 아닙니다. 다만 시간이 부족한 사람이라면, 적어도 이 상품이 어떻게 작동하는지는 알고 판단할 필요가 있지 않을까 — 그런 생각에서 이 글을 쓰게 되었습니다.</p>
+</div>
+
+<div class="section">
+  <div class="eyebrow">레버리지, 정말 위험하기만 할까</div>
+  <h2 class="sec-title">역사적 실제 결과는<br>어땠나?</h2>
+
+  <p class="body">위험하다고만 들었는데, 실제 결과는 이렇다고?</p>
+
+  <p class="body">사실 저도 위험한 측면만 생각했습니다. 전문가들이 안 된다고 하니 알아볼 생각조차 하지 않았습니다. 그런데 자료를 직접 찾아보고 나서는, 저조차 놀랐습니다.</p>
+
+  <p class="body">앞서 2005~2025년(20년) 기준으로 나스닥100 지수가 약 18배가 됐다고 말씀드렸습니다.</p>
+
+  <p class="body">TQQQ는 2010년에 상장되었습니다. 가정이 아닌 실제 데이터 값을 비교하기 위해, 비교 기간을 서두에 말씀드린 2005년이 아닌 2010년으로 두겠습니다. 그래서 지수의 배수도 18배가 아니라 12.9배로 다르게 나옵니다.</p>
+
+  <div class="dark-card">
+    <div class="dark-card-title">TQQQ 상장 이후 — 나스닥100 지수 vs TQQQ (2010년 말=100, 로그 스케일)</div>
+    <svg viewBox="0 0 340 200" width="100%" style="overflow:visible;">
+      <line x1="20" y1="154.17" x2="320" y2="154.17" stroke="rgba(248,247,243,0.15)" stroke-width="1" stroke-dasharray="2,3"/>
+      <line x1="20" y1="95.83" x2="320" y2="95.83" stroke="rgba(248,247,243,0.15)" stroke-width="1" stroke-dasharray="2,3"/>
+      <line x1="20" y1="37.5" x2="320" y2="37.5" stroke="rgba(248,247,243,0.15)" stroke-width="1" stroke-dasharray="2,3"/>
+      <text x="0" y="151" font-size="7" fill="rgba(248,247,243,0.4)">100</text>
+      <text x="0" y="93" font-size="7" fill="rgba(248,247,243,0.4)">1,000</text>
+      <text x="0" y="35" font-size="7" fill="rgba(248,247,243,0.4)">10,000</text>
+
+      <polyline points="20,154.17 40,153.32 60,149.10 80,141.20 100,136.75 120,134.44 140,132.70 160,125.54 180,125.55 200,117.22 220,107.19 240,101.06 260,111.05 280,99.71 300,93.91 320,89.40" fill="none" stroke="var(--accent-light)" stroke-width="2"/>
+      <polyline points="20,154.17 40,156.29 60,145.64 80,123.48 100,112.05 120,108.03 140,105.29 160,85.54 180,91.14 200,69.63 220,50.81 240,35.52 260,75.15 280,47.49 300,35.85 320,28.37" fill="none" stroke="#F4A261" stroke-width="2"/>
+
+      <circle cx="260" cy="75.15" r="2.5" fill="#F4A261"/>
+      <circle cx="320" cy="28.37" r="3" fill="#F4A261"/>
+      <circle cx="320" cy="89.40" r="3" fill="var(--accent-light)"/>
+
+      <text x="255" y="70" font-size="8.5" fill="#F4A261" text-anchor="end" font-family="var(--font-mono)">2022년 -79%</text>
+      <text x="316" y="22" font-size="9.5" fill="#F4A261" text-anchor="end" font-family="var(--font-mono)">143배</text>
+      <text x="316" y="85" font-size="9.5" fill="var(--accent-light)" text-anchor="end" font-family="var(--font-mono)">12.9배</text>
+
+      <text x="20" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2010</text>
+      <text x="120" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2015</text>
+      <text x="220" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2020</text>
+      <text x="320" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2025</text>
+    </svg>
+    <div style="display:flex; gap:16px; justify-content:center; margin-top:10px; font-size:11px; color:rgba(248,247,243,0.6);">
+      <span><span style="display:inline-block;width:8px;height:8px;background:var(--accent-light);border-radius:2px;margin-right:4px;"></span>나스닥100 지수</span>
+      <span><span style="display:inline-block;width:8px;height:8px;background:#F4A261;border-radius:2px;margin-right:4px;"></span>TQQQ (3배)</span>
+    </div>
+  </div>
+
+  <p class="body">TQQQ가 상장된 2010년 이후 15년간, 나스닥100 지수는 약 12.9배가 됐습니다. 같은 기간 TQQQ는 약 143배가 됐습니다.</p>
+
+  <div class="dark-card">
+    <div class="dark-card-title">확대 — 2019년~2023년 (2019년=100)</div>
+    <svg viewBox="0 0 320 195" width="100%" style="overflow:visible;">
+      <line x1="30" y1="126.67" x2="300" y2="126.67" stroke="rgba(248,247,243,0.25)" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="2" y="130" font-size="8" fill="rgba(248,247,243,0.4)">1.00배</text>
+
+      <polyline points="30,126.67 97.5,110.46 165,96.90 232.5,117.47 300,93.47" fill="none" stroke="var(--accent-light)" stroke-width="2"/>
+      <polyline points="30,126.67 97.5,89.97 165,31.88 232.5,133.20 300,80.13" fill="none" stroke="#F4A261" stroke-width="2"/>
+
+      <circle cx="165" cy="31.88" r="3" fill="#F4A261"/>
+      <circle cx="232.5" cy="133.20" r="3" fill="#F4A261"/>
+      <circle cx="232.5" cy="117.47" r="3" fill="var(--accent-light)"/>
+      <circle cx="300" cy="80.13" r="3" fill="#F4A261"/>
+      <circle cx="300" cy="93.47" r="3" fill="var(--accent-light)"/>
+
+      <text x="165" y="24" font-size="9" fill="#F4A261" text-anchor="middle" font-family="var(--font-mono)">3.84배</text>
+      <text x="232.5" y="147" font-size="9" fill="#F4A261" text-anchor="middle" font-family="var(--font-mono)">0.80배</text>
+      <text x="296" y="75" font-size="9" fill="#F4A261" text-anchor="end" font-family="var(--font-mono)">2.40배</text>
+      <text x="296" y="112" font-size="9" fill="var(--accent-light)" text-anchor="end" font-family="var(--font-mono)">2.00배</text>
+
+      <text x="30" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2019</text>
+      <text x="97.5" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2020</text>
+      <text x="165" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2021</text>
+      <text x="232.5" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2022</text>
+      <text x="300" y="182" font-size="8" fill="rgba(248,247,243,0.4)" text-anchor="middle">2023</text>
+    </svg>
+    <div style="display:flex; gap:16px; justify-content:center; margin-top:10px; font-size:11px; color:rgba(248,247,243,0.6);">
+      <span><span style="display:inline-block;width:8px;height:8px;background:var(--accent-light);border-radius:2px;margin-right:4px;"></span>나스닥100 지수</span>
+      <span><span style="display:inline-block;width:8px;height:8px;background:#F4A261;border-radius:2px;margin-right:4px;"></span>TQQQ (3배)</span>
+    </div>
+  </div>
+
+  <p class="body">그런데 그 안에는 2022년, 원금이 시작 지점보다 더 아래로 꺼지는 구간이 있었습니다. 2021년 최고치 이후 TQQQ는 -79% 빠졌습니다. 같은 기간 지수는 -33% 빠지는 데 그쳤는데도요.</p>
+
+  <p class="body">이 그래프를 보면 언제 들어갔는지가 결과를 크게 갈라놓는 것처럼 보일 수 있습니다. 실제로 그렇습니다. 레버리지 상품은 인덱스보다 진입 시점에 훨씬 민감하게 반응합니다. 그 민감함을 어떻게 다룰지는 뒤에서 다시 다루겠습니다.</p>
+
+  <div class="hl">레버리지는 우상향의 방향만 3배로 미는 게 아니라, 오르내리는 폭 자체를 3배로 밉니다.</div>
+
+  <p class="body">복리의 효과가 오를 때도 내릴 때도 똑같이 작동한다는 뜻입니다.</p>
+
+  <div class="note">그래서 이 상품을 무조건 좋다거나 나쁘다고 말하기는 어렵습니다. 같은 오르내림이라도 일반 상품과는 완전히 다른 파장으로 전달된다는 것 — 이 글이 먼저 확인하고 싶은 지점입니다.</div>
+</div>
+
+<div class="next">
+  <div class="next-label">다음 · 챕터 1</div>
+  <div class="next-q">"왜 오를 때도, 내릴 때도<br>3배 그대로가 아닐까요?"</div>
+  <div class="next-hint">매일 재설정되는 구조 — 양의 복리 효과가 만들어지는 원리</div>
+  <a href="chapter1.html" class="next-btn">다음으로 →</a>
+</div>
+
+<div class="section">
+  <div class="eyebrow">출처</div>
+  <div class="sources">
+  <div class="src-item"><span class="src-num">1</span>나스닥100(NDX) 지수 및 TQQQ(ProShares UltraPro QQQ) 연도별 수익률 기준. 2005년 말~2025년 말(20년) 나스닥100 누적 약 17.8배. 2010년 말~2025년 말(15년) 나스닥100 누적 약 12.9배, TQQQ 누적 약 143배(2022년 저점 -79%, 2021년 대비). 2019년~2023년 구간은 2019년 말 값을 1.00배로 재환산. 배당 재투자는 나스닥100 지수 수익률에 근사 반영되었으나 환율 변동은 고려하지 않음. 출처: Slickcharts, StockAnalysis, PortfoliosLab, Yahoo Finance, financecharts.com 연간 수익률 데이터.</div>
+  <div class="src-item"><span class="src-num">2</span>2배 레버리지 상품(QLD·나스닥100, SSO·S&P500)은 2006년 6월 19일 상장. 3배 레버리지 상품 중 S&P500 추종(UPRO)은 2009년 6월 25일, 나스닥100 추종(TQQQ)은 2010년 2월 9일 상장. 출처: ProShares, SEC EDGAR 공시자료.</div>
+  </div>
+</div>
+
+<div class="backhome-wrap">
+  <a href="index.html" class="backhome-btn">☰ 목차로</a>
+</div>
+<div class="footer">
+  © Stillwater Investment Essays<br>
+  본 콘텐츠의 무단 복제 및 배포를 금합니다.<br>
+  <span style="display:block; margin-top:4px;">투자 결과의 책임은 본인에게 있습니다.</span>
+</div>
+
+</body>
+</html>
